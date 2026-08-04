@@ -250,13 +250,13 @@ _inferencing.h
 For example:
 
 ```text
-Dice_v4_inferencing.h
+Dice_inferencing.h
 ```
 
 Then modify the sketch:
 
 ```cpp
-#include <Dice_v4_inferencing.h>
+#include <Dice_inferencing.h>
 ```
 
 The filename depends on your own Edge Impulse project.
