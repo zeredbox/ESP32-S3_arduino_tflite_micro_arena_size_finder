@@ -152,20 +152,32 @@ The sketch is a diagnostic and sizing tool. It does **not** replace the camera o
 
 You need:
 
-- An ESP32-S3 board.
-- PSRAM enabled on the board.
-- An ESP32-S3 module with 8 MB flash (64 Mbit) if you use the Arduino IDE settings described below.
+- An **ESP32-S3 N16R8 development board** with PSRAM.
+
+  This repository was tested with a **Goouuu ESP32-S3 N16R8**, a DevKitC-1–compatible board equipped with **16 MB of flash memory** and **8 MB of PSRAM**.
+
+  Other ESP32-S3 boards with PSRAM may also work, such as an ESP32-S3-DevKitC-1 N16R8 or another development board based on an ESP32-S3-WROOM-1 N16R8 module.
+
+> [!NOTE]
+> To keep this guide focused and reproducible, all Arduino IDE settings and technical recommendations in this repository are based on the **ESP32-S3 N16R8 configuration**: **16 MB flash** and **8 MB PSRAM**.
+>
+> If you use another ESP32-S3 board or another memory configuration, the sketch may still work, but you must adapt the Arduino IDE settings—especially **Board**, **Flash Size**, **PSRAM mode**, and **Partition Scheme**—to match your hardware.
+
 - Arduino IDE 2.x.
 - Espressif's ESP32 board package installed in Arduino IDE.
-- An Edge Impulse project exported as an Arduino library.
+- An Edge Impulse project exported as an Arduino library using TensorFlow Lite.
 - The `.ino` sketch from this repository.
 
 > [!NOTE]
-> **Flash memory** and **PSRAM** are different.
+> The ESP32-S3 uses different types of memory, each with a different role:
 >
-> - **Flash** stores the firmware, model code, program, and static assets.
-> - **PSRAM** is external working memory used while the program runs.
-> - **Internal SRAM** is faster working memory inside the ESP32-S3 and is commonly used for the TensorFlow Lite Micro tensor arena.
+> - **Flash memory** is long-term storage. It contains the compiled Arduino program, the Edge Impulse library, the TensorFlow Lite Micro model, and other static files. Flash keeps its contents when the board is powered off.
+>
+> - **Internal SRAM** is the ESP32-S3's fast working memory. It is used while the program runs for variables, stacks, temporary buffers, and—by default—the TensorFlow Lite Micro tensor arena. Internal SRAM is limited, so the tensor arena size must be chosen carefully.
+>
+> - **PSRAM** is additional external working memory available on some ESP32-S3 boards. It is larger than internal SRAM but generally slower. In this sketch, PSRAM is used for the large input image buffer, preserving internal SRAM for the TensorFlow Lite Micro tensor arena and the rest of the application.
+>
+> Both internal SRAM and PSRAM are volatile: their contents are cleared when the board is reset or powered off.
 
 ---
 
