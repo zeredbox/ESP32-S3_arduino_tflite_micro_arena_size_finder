@@ -24,13 +24,15 @@ The arena must be large enough for all these allocations. If it is too small, Te
 
 ## 🎯 Why this repository exists
 
-However, when developing and deploying an on-device AI project on an ESP32-S3, two stages of the process require particularly careful choices:
+When developing and deploying an on-device AI project on an ESP32-S3, two stages of the process require particularly careful choices:
 
 1. Choosing an AI model in Edge Impulse that can actually run on an ESP32-S3. Edge Impulse offers many learning blocks, model architectures, and deployment options, but not every combination is suitable for the memory and performance limits of this board.
 
 2. Deploying the model as an Arduino library and selecting the correct TensorFlow Lite Micro tensor arena size.
 
 > [!IMPORTANT]
+
+
 > This repository provides concrete, measured information about both critical points: choosing an Edge Impulse AI model that can run on an ESP32-S3, and configuring the required TensorFlow Lite Micro tensor arena memory. It helps avoid a situation where a model trains successfully but cannot be deployed or run reliably on the ESP32-S3.
 
 It is the result of many tests carried out to find a working combination of model, input size, deployment settings, memory configuration, and tensor arena size. By making this work public, the goal is to save time for hobbyists and makers who want to start a similar project.
