@@ -25,7 +25,7 @@ The Arduino sketch in this repository:
 
 The sketch is a diagnostic and sizing tool. It does **not** replace the camera or sensor code in a final project.
 
-### 📖 A few technical terms
+## 📖 A few technical terms
 
 Before continuing, here are two technical terms used throughout this guide:
 
@@ -35,7 +35,7 @@ A **tensor arena** is a single block of RAM reserved in advance for TensorFlow L
 
 The arena must be large enough for all these allocations. If it is too small, TensorFlow Lite Micro cannot allocate the model tensors and inference fails. If it is unnecessarily large, it reserves internal SRAM that could otherwise be used by the camera, display, Wi-Fi, or application code.
 
-### 🧠 Understanding ESP32-S3 Memory
+## 🧠 Understanding ESP32-S3 Memory
 
 The ESP32-S3 uses different types of memory, each with a different role:
 - **Flash memory** is long-term storage. It contains the compiled Arduino program, the Edge Impulse library, the TensorFlow Lite Micro model, and other static files. Flash keeps its contents when the board is powered off.
