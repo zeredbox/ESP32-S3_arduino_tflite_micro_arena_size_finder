@@ -17,7 +17,7 @@ Together with **[Edge Impulse](https://edgeimpulse.com/)**, ESP32-S3 provides a 
 >
 > The example used in this repository is an image-classification model created in Edge Impulse to recognize each face of a die.
 >
-> The model uses 224×224 pixel images.
+> The model uses 224×224 pixel images captured by the OV2640 camera module connected to the ESP32-S3.
 >
 > </td>
 > <td width="240">
