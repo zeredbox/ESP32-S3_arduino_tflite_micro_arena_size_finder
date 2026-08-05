@@ -13,6 +13,22 @@ Together with **[Edge Impulse](https://edgeimpulse.com/)**, ESP32-S3 provides a 
 > [!NOTE]
 > The example used in this repository is an image-classification model created in Edge Impulse to recognize each face of a die with 224x224 images.
 >![Dice 224x224](images/dice_224x224.jpg)
+>
+> > [!NOTE]
+> <table>
+>   <tr>
+>     <td valign="top">
+>       The example used in this repository is an image-classification model created in Edge Impulse to recognize each face of a die.
+>
+>       The model uses 224×224 pixel images.
+>     </td>
+>     <td width="240">
+>       <img src="images/dice_224x224.jpg"
+>            alt="Yellow die used by the image-classification model"
+>            width="224">
+>     </td>
+>   </tr>
+> </table>
 
 ## 🔍 What the sketch does
 
