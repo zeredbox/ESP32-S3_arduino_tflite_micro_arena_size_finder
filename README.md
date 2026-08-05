@@ -62,6 +62,8 @@ The ESP32-S3 uses different types of memory, each with a different role:
 
 Both internal SRAM and PSRAM are volatile: their contents are cleared when the board is reset or powered off.
 
+- **microSD card** is removable, non-volatile file storage. It can hold large datasets, captured camera images, logs, configuration files, or other user files, and it keeps its contents when the board is powered off. Unlike Flash, it does not normally store or run the Arduino program; unlike SRAM and PSRAM, it is not working memory for variables or the TensorFlow Lite Micro tensor arena. The ESP32-S3 reads and writes files on the card through an SDMMC or SPI interface.
+
 ---
 
 ## 🎯 Why this repository exists
