@@ -213,7 +213,7 @@ Before exporting the library, create and train an image-classification impulse i
 
 The resulting model expects 224×224 pixel images captured by the camera connected to the ESP32-S3.
 
-![Create Impulse 224x224](Edge-Impulse_Create-Impulse.PNG)
+![Create Impulse 224x224](images/Edge-Impulse_Create-Impulse.PNG)
 
 
 ### 🧩 Use TensorFlow Lite, not EON
