@@ -1,21 +1,31 @@
 # 🤖 Arduino ESP32-S3 + Edge Impulse: Find the Right Tensor Arena Size
 
-This repository contains an Arduino sketch that measures the TensorFlow Lite Micro tensor arena used by an Edge Impulse model on an ESP32-S3 with PSRAM. It is intended for Arduino hobbyists and makers who have exported an Edge Impulse project as an Arduino library and need to make it run reliably on their board.
+## 👋 Introduction
 
-**TensorFlow Lite Micro** (often called **TFLite Micro** or **TFLM**) is a lightweight C++ runtime designed to run trained machine-learning models directly on microcontrollers and other embedded devices with limited memory.
+This repository contains an Arduino sketch that measures the TensorFlow Lite Micro tensor arena used by an Edge Impulse model on an ESP32-S3 with PSRAM.
 
-A **tensor arena** is a single block of RAM reserved in advance for TFLite Micro. During inference, the runtime uses this block to store the model input and output tensors, intermediate activation data, persistent model data, and temporary working buffers. The arena must be large enough for all these allocations; if it is too small, TensorFlow Lite Micro cannot allocate the model tensors and inference fails.
+It is intended for Arduino hobbyists and makers who have exported an [Edge Impulse](https://edgeimpulse.com/) project as an Arduino library and need to make it run reliably on their board.
 
-Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it possible to explore original and engaging on-device AI projects at a modest cost. Its dual-core processor, optional PSRAM, Wi-Fi and Bluetooth connectivity, and vector instructions for neural-network and signal-processing workloads provide a practical base for experiments such as image classification, sound recognition, gesture detection, sensor analysis, and connected edge-AI devices.
+**TensorFlow Lite Micro** (also called **TFLite Micro** or **TFLM**) is a lightweight C++ runtime designed to run trained machine-learning models directly on microcontrollers and other embedded devices with limited memory.
 
-Together with **[Edge Impulse](https://edgeimpulse.com/)**, it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
+A **tensor arena** is a single block of RAM reserved in advance for TensorFlow Lite Micro. During inference, the runtime uses this memory to store model inputs, outputs, intermediate activation data, persistent model data, and temporary working buffers.
+
+The arena must be large enough for all these allocations. If it is too small, TensorFlow Lite Micro cannot allocate the model tensors and inference fails. If it is unnecessarily large, it reserves internal SRAM that could otherwise be used by the camera, display, Wi-Fi, or application code.
+
+Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it possible to explore original and engaging on-device AI projects at a modest cost. Its dual-core processor, optional PSRAM, Wi-Fi and Bluetooth connectivity, and support for AI and DSP-oriented instructions provide a practical base for image classification, sound recognition, gesture detection, sensor analysis, and connected edge-AI devices.
+
+Together with [Edge Impulse](https://edgeimpulse.com/), it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
+
+--
+
+## 🎯 Why this repository exists
 
 However, two parts still require careful choices:
 
-1. **Choosing an AI model in Edge Impulse** that can actually run on an ESP32-S3. Edge Impulse offers many learning blocks, model architectures, and deployment options, but not every combination is suitable for the memory and performance limits of this board.
-2. Deploying the model as an Arduino library and **selecting the correct TensorFlow Lite Micro tensor arena size**.
+1. Choosing an AI model in Edge Impulse that can actually run on an ESP32-S3. Edge Impulse offers many learning blocks, model architectures, and deployment options, but not every combination is suitable for the memory and performance limits of this board.
 
-## 🎯 Why this repository exists
+2. Deploying the model as an Arduino library and selecting the correct TensorFlow Lite Micro tensor arena size.
+
 > [!IMPORTANT]
 > This repository provides concrete, measured information about both critical points: choosing an Edge Impulse AI model that can run on an ESP32-S3, and configuring the required TensorFlow Lite Micro tensor arena memory. It helps avoid a situation where a model trains successfully but cannot be deployed or run reliably on the ESP32-S3.
 
@@ -24,7 +34,7 @@ It is the result of many tests carried out to find a working combination of mode
 > [!NOTE]
 > The example used in this repository is an image-classification model created in Edge Impulse to recognize each face of a die.
 
----
+--
 
 ## 📌 A practical ESP32-S3 model reference
 
