@@ -10,6 +10,10 @@ Together with **[Edge Impulse](https://edgeimpulse.com/)**, ESP32-S3 provides a 
 
 **This repository is intended for Arduino hobbyists and makers who have created an AI model with Edge Impulse and want to deploy it reliably on an ESP32-S3 as an Arduino library.**
 
+> [!NOTE]
+> The example used in this repository is an image-classification model created in Edge Impulse to recognize each face of a die.
+>![Dice 224x224](images/dice_224x224.PNG)
+
 ## 🔍 What the sketch does
 
 The Arduino sketch in this repository:
@@ -59,9 +63,6 @@ When developing and deploying an on-device AI project on an ESP32-S3, two stages
 **This repository provides concrete, measured information about both critical points: choosing an Edge Impulse AI model that can run on an ESP32-S3, and configuring the required TensorFlow Lite Micro tensor arena memory. It helps avoid a situation where a model trains successfully but cannot be deployed or run reliably on the ESP32-S3.**
 
 It is the result of many tests carried out to find a working combination of model, input size, deployment settings, memory configuration, and tensor arena size. By making this work public, the goal is to save time for hobbyists and makers who want to start a similar project.
-
-> [!NOTE]
-> The example used in this repository is an image-classification model created in Edge Impulse to recognize each face of a die.
 
 ## 📌 A practical ESP32-S3 model reference
 
