@@ -17,7 +17,7 @@ Together with **[Edge Impulse](https://edgeimpulse.com/)**, ESP32-S3 provides a 
 >
 > The example used in this repository is an image-classification model created in Edge Impulse to recognize each face of a die.
 >
-> The model uses 224×224 pixel images captured by the OV2640 camera module connected to the ESP32-S3.
+> The model uses 224×224 pixel images in RGB color format, captured by the OV2640 camera module connected to the ESP32-S3.
 >
 > </td>
 > <td width="240">
@@ -90,7 +90,7 @@ The example behind this repository is an Edge Impulse image-classification proje
 - Total inference time: approximately **499 ms**
 - Practical rate: just under **2 images per second**
 
-For this die-recognition project, a lower image resolution would probably have been sufficient. The purpose of configuring the Edge Impulse impulse at 224 x 224 was to explore the highest practical image resolution that could be processed on an ESP32-S3 for more demanding future projects.
+For this dice recognition project, a lower image resolution or grayscale images instead of RGB would probably have been sufficient, reducing the model's memory requirements and inference workload. The purpose of configuring the Edge Impulse impulse at 224 x 224 RGB was to explore the highest practical image resolution that could be processed on an ESP32-S3 for more demanding future projects.
 
 In Edge Impulse, the image width and height selected in **Impulse Design > Create Impulse** define the image size processed by the Image data block and expected by the exported classifier. In this project, the impulse is configured for 224 x 224 RGB images.
 
@@ -98,7 +98,7 @@ The `96x96` part of the `MobileNetV1 96x96 0.25` name refers to the model's pre-
 The `0.25` value is MobileNet's width multiplier. It reduces the number of channels in the neural network, reducing the model size, RAM requirement, and computation compared with wider MobileNet variants.
 
 > [!NOTE]
-> MobileNetV1 96x96 0.25 was the most suitable model tested for this ESP32-S3 project. It provided a workable balance between classification accuracy, memory use, and inference time.**
+> MobileNetV1 96x96 0.25 was the most suitable model tested for this ESP32-S3 project. It provided a workable balance between classification accuracy, memory use, and inference time.
 
 This does not mean that MobileNetV1 96x96 0.25 is automatically the best choice for every ESP32-S3 project. The appropriate model depends on the required accuracy, the image size configured in the impulse, the number of classes, the available memory, and the acceptable neural-network inference time. The **Neural-network inference time (NN time)** is the time required by the ESP32-S3 to execute the trained neural network and produce the classification probabilities.
 
