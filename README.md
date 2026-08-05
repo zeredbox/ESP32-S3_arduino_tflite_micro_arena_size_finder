@@ -98,9 +98,7 @@ The `96x96` part of the `MobileNetV1 96x96 0.25` name refers to the model's pre-
 
 The `0.25` value is MobileNet's width multiplier. It reduces the number of channels in the neural network, reducing the model size, RAM requirement, and computation compared with wider MobileNet variants.
 
-This does not mean that MobileNetV1 96x96 0.25 is automatically the best choice for every ESP32-S3 project. The appropriate model depends on the required accuracy, the image size configured in the impulse, the number of classes, the available memory, and the acceptable neural-network inference time.
-
-Here, **neural-network inference time** is the time required by the ESP32-S3 to execute the trained neural network and produce the classification probabilities.
+This does not mean that MobileNetV1 96x96 0.25 is automatically the best choice for every ESP32-S3 project. The appropriate model depends on the required accuracy, the image size configured in the impulse, the number of classes, the available memory, and the acceptable neural-network inference time. The **Neural-network inference time (NN time)** is the time required by the ESP32-S3 to execute the trained neural network and produce the classification probabilities.
 
 It is reported separately from the DSP time in Edge Impulse:
 
