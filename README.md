@@ -10,6 +10,21 @@ Together with **[Edge Impulse](https://edgeimpulse.com/)**, ESP32-S3 provides a 
 
 **This repository is intended for Arduino hobbyists and makers who have created an AI model with Edge Impulse and want to deploy it reliably on an ESP32-S3 as an Arduino library.**
 
+## 🔍 What the sketch does
+
+The Arduino sketch in this repository:
+
+- Prints free internal SRAM heap.
+- Prints the largest available contiguous SRAM heap block.
+- Prints free and total PSRAM.
+- Allocates the Edge Impulse input feature buffer in PSRAM.
+- Runs `run_classifier()` once with a zero-filled test input.
+- Prints memory usage before and after inference.
+- Prints classification output and timing.
+- Displays the TFLite Micro tensor-arena measurement after a small debug addition inside the Edge Impulse SDK.
+
+The sketch is a diagnostic and sizing tool. It does **not** replace the camera or sensor code in a final project.
+
 ### 📖 A few technical terms
 
 Before continuing, here are two technical terms used throughout this guide:
@@ -144,23 +159,6 @@ M = 536059 bytes
 ```
 
 for that specific model.
-
----
-
-## 🔍 What the sketch does
-
-The Arduino sketch in this repository:
-
-- Prints free internal SRAM heap.
-- Prints the largest available contiguous SRAM heap block.
-- Prints free and total PSRAM.
-- Allocates the Edge Impulse input feature buffer in PSRAM.
-- Runs `run_classifier()` once with a zero-filled test input.
-- Prints memory usage before and after inference.
-- Prints classification output and timing.
-- Displays the TFLite Micro tensor-arena measurement after a small debug addition inside the Edge Impulse SDK.
-
-The sketch is a diagnostic and sizing tool. It does **not** replace the camera or sensor code in a final project.
 
 ---
 
