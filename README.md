@@ -16,11 +16,9 @@ Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it pos
 
 Together with [Edge Impulse](https://edgeimpulse.com/), it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
 
---
-
 ## 🎯 Why this repository exists
 
-However, two parts still require careful choices:
+However, when developing and deploying an on-device AI project on an ESP32-S3, two stages of the process require particularly careful choices:
 
 1. Choosing an AI model in Edge Impulse that can actually run on an ESP32-S3. Edge Impulse offers many learning blocks, model architectures, and deployment options, but not every combination is suitable for the memory and performance limits of this board.
 
@@ -33,8 +31,6 @@ It is the result of many tests carried out to find a working combination of mode
 
 > [!NOTE]
 > The example used in this repository is an image-classification model created in Edge Impulse to recognize each face of a die.
-
---
 
 ## 📌 A practical ESP32-S3 model reference
 
