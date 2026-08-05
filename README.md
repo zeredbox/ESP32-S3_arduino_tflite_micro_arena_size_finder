@@ -20,6 +20,17 @@ A **tensor arena** is a single block of RAM reserved in advance for TensorFlow L
 
 The arena must be large enough for all these allocations. If it is too small, TensorFlow Lite Micro cannot allocate the model tensors and inference fails. If it is unnecessarily large, it reserves internal SRAM that could otherwise be used by the camera, display, Wi-Fi, or application code.
 
+### 🧠 Understanding ESP32-S3 Memory
+
+The ESP32-S3 uses different types of memory, each with a different role:
+- **Flash memory** is long-term storage. It contains the compiled Arduino program, the Edge Impulse library, the TensorFlow Lite Micro model, and other static files. Flash keeps its contents when the board is powered off.
+
+- **Internal SRAM** is the ESP32-S3's fast working memory. It is used while the program runs for variables, stacks, temporary buffers, and—by default—the TensorFlow Lite Micro tensor arena. Internal SRAM is limited, so the tensor arena size must be chosen carefully.
+
+- **PSRAM** is additional external working memory available on some ESP32-S3 boards. It is larger than internal SRAM but generally slower. In this sketch, PSRAM is used for the large input image buffer, preserving internal SRAM for the TensorFlow Lite Micro tensor arena and the rest of the application.
+
+Both internal SRAM and PSRAM are volatile: their contents are cleared when the board is reset or powered off.
+
 ---
 
 ## 🎯 Why this repository exists
@@ -172,17 +183,6 @@ You need:
 - Espressif's ESP32 board package installed in Arduino IDE.
 - An Edge Impulse project exported as an Arduino library using TensorFlow Lite.
 - The `.ino` sketch from this repository.
-
-> [!NOTE]
-> The ESP32-S3 uses different types of memory, each with a different role:
->
-> - **Flash memory** is long-term storage. It contains the compiled Arduino program, the Edge Impulse library, the TensorFlow Lite Micro model, and other static files. Flash keeps its contents when the board is powered off.
->
-> - **Internal SRAM** is the ESP32-S3's fast working memory. It is used while the program runs for variables, stacks, temporary buffers, and—by default—the TensorFlow Lite Micro tensor arena. Internal SRAM is limited, so the tensor arena size must be chosen carefully.
->
-> - **PSRAM** is additional external working memory available on some ESP32-S3 boards. It is larger than internal SRAM but generally slower. In this sketch, PSRAM is used for the large input image buffer, preserving internal SRAM for the TensorFlow Lite Micro tensor arena and the rest of the application.
->
-> Both internal SRAM and PSRAM are volatile: their contents are cleared when the board is reset or powered off.
 
 ---
 
