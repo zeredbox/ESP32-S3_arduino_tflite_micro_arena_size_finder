@@ -52,7 +52,7 @@ Both internal SRAM and PSRAM are volatile: their contents are cleared when the b
 
 When developing and deploying an on-device AI project on an ESP32-S3, two stages of the process require particularly careful choices:
 
-1. Choosing an AI model in Edge Impulse that can actually run on an ESP32-S3. Edge Impulse offers many learning blocks, model architectures, and deployment options, but not every combination is suitable for the memory and performance limits of this board.
+1. Choosing an AI model in Edge Impulse that can actually run on an ESP32-S3. Edge Impulse offers many learning blocks, model architectures, and deployment options, but not every combination is suitable for the memory and performance limits of the ESP32-S3 board.
 
 2. Deploying the model as an Arduino library and selecting the correct TensorFlow Lite Micro tensor arena size.
 
