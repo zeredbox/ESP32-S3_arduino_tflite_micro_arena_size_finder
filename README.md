@@ -11,10 +11,6 @@ Together with **[Edge Impulse](https://edgeimpulse.com/)**, ESP32-S3 provides a 
 **This repository is intended for Arduino hobbyists and makers who have created an AI model with Edge Impulse and want to deploy it reliably on an ESP32-S3 as an Arduino library.**
 
 > [!NOTE]
-> The example used in this repository is an image-classification model created in Edge Impulse to recognize each face of a die with 224x224 images.
->![Dice 224x224](images/dice_224x224.jpg)
-
-> [!NOTE]
 > <table>
 > <tr>
 > <td valign="top">
