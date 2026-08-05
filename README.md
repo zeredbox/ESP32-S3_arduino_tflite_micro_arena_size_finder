@@ -2,9 +2,17 @@
 
 ## 👋 Introduction
 
-This repository contains an Arduino sketch that measures the TensorFlow Lite Micro tensor arena used by an Edge Impulse model on an ESP32-S3 with PSRAM.
+This repository contains an **Arduino sketch** that measures the TensorFlow Lite Micro tensor arena used by an Edge Impulse model on an ESP32-S3 with PSRAM.
 
-It is intended for Arduino hobbyists and makers who have exported an **[Edge Impulse](https://edgeimpulse.com/)** project as an Arduino library and need to make it run reliably on their board.
+Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it possible to explore original and engaging on-device AI projects at a modest cost. Its dual-core processor, optional PSRAM, Wi-Fi and Bluetooth connectivity, and support for AI and DSP-oriented instructions provide a practical base for image classification, sound recognition, gesture detection, sensor analysis, and connected edge-AI devices.
+
+Together with **[Edge Impulse](https://edgeimpulse.com/)**, ESP32-S3 provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
+
+**This repository is intended for Arduino hobbyists and makers who have created an AI model with Edge Impulse and want to deploy it reliably on an ESP32-S3 as an Arduino library.**
+
+### 📖 A few technical terms
+
+Before continuing, here are two technical terms used throughout this guide:
 
 **TensorFlow Lite Micro** (also called **TFLite Micro** or **TFLM**) is a lightweight C++ runtime designed to run trained machine-learning models directly on microcontrollers and other embedded devices with limited memory.
 
@@ -12,9 +20,7 @@ A **tensor arena** is a single block of RAM reserved in advance for TensorFlow L
 
 The arena must be large enough for all these allocations. If it is too small, TensorFlow Lite Micro cannot allocate the model tensors and inference fails. If it is unnecessarily large, it reserves internal SRAM that could otherwise be used by the camera, display, Wi-Fi, or application code.
 
-Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it possible to explore original and engaging on-device AI projects at a modest cost. Its dual-core processor, optional PSRAM, Wi-Fi and Bluetooth connectivity, and support for AI and DSP-oriented instructions provide a practical base for image classification, sound recognition, gesture detection, sensor analysis, and connected edge-AI devices.
-
-Together with **Edge Impulse**, it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
+---
 
 ## 🎯 Why this repository exists
 
