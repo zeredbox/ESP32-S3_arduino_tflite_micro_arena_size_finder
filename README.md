@@ -2,7 +2,7 @@
 
 ## 👋 Introduction
 
-This repository contains an **Arduino sketch** that measures the TensorFlow Lite Micro tensor arena used by an Edge Impulse model on an ESP32-S3 with PSRAM.
+This repository contains an **Arduino sketch** that measures the **TensorFlow Lite Micro tensor arena** used by an **Edge Impulse model** on an **ESP32-S3** with PSRAM.
 
 Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it possible to explore original and engaging on-device AI projects at a modest cost. Its dual-core processor, optional PSRAM, Wi-Fi and Bluetooth connectivity, and support for AI and DSP-oriented instructions provide a practical base for image classification, sound recognition, gesture detection, sensor analysis, and connected edge-AI devices.
 
