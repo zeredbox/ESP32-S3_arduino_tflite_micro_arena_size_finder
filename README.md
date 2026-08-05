@@ -199,7 +199,7 @@ You need:
 
 ⚠️ Step 1: Create and Export the Edge Impulse Model
 
-### 🧩 Create the impulse
+### ⚙️ Create the impulse
 
 Before exporting the library, create and train an image-classification impulse in Edge Impulse Studio:
 
@@ -212,6 +212,9 @@ Before exporting the library, create and train an image-classification impulse i
 7. Generate features, configure the Transfer Learning model, and train it with your labeled die images.
 
 The resulting model expects 224×224 pixel images captured by the camera connected to the ESP32-S3.
+
+![Create Impulse 224x224](Edge-Impulse_Create-Impulse.PNG)
+
 
 ### 🧩 Use TensorFlow Lite, not EON
 
