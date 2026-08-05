@@ -16,6 +16,7 @@ However, two parts still require careful choices:
 2. Deploying the model as an Arduino library and **selecting the correct TensorFlow Lite Micro tensor arena size**.
 
 ## 🎯 Why this repository exists
+> [!IMPORTANT]
 > This repository provides concrete, measured information about both critical points: choosing an Edge Impulse AI model that can run on an ESP32-S3, and configuring the required TensorFlow Lite Micro tensor arena memory. It helps avoid a situation where a model trains successfully but cannot be deployed or run reliably on the ESP32-S3.
 
 It is the result of many tests carried out to find a working combination of model, input size, deployment settings, memory configuration, and tensor arena size. By making this work public, the goal is to save time for hobbyists and makers who want to start a similar project.
