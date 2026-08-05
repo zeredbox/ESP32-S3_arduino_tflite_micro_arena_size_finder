@@ -8,7 +8,7 @@ A **tensor arena** is a single block of RAM reserved in advance for TFLite Micro
 
 Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it possible to explore original and engaging on-device AI projects at a modest cost. Its dual-core processor, optional PSRAM, Wi-Fi and Bluetooth connectivity, and vector instructions for neural-network and signal-processing workloads provide a practical base for experiments such as image classification, sound recognition, gesture detection, sensor analysis, and connected edge-AI devices.
 
-Together with **Edge Impulse**, it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
+Together with **[Edge Impulse](https://edgeimpulse.com/)**, it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
 
 However, two parts still require careful choices:
 
