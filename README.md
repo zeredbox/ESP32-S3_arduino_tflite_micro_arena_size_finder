@@ -1,27 +1,34 @@
 # 🤖 Arduino ESP32-S3 + Edge Impulse: Find the Right Tensor Arena Size
 
-This repository contains an Arduino sketch that measures the TensorFlow Lite Micro tensor arena used by an Edge Impulse model on an ESP32-S3 with PSRAM.
+This repository contains an Arduino sketch that measures the TensorFlow Lite Micro tensor arena used by an Edge Impulse model on an ESP32-S3 with PSRAM. It is intended for Arduino hobbyists and makers who have exported an Edge Impulse project as an Arduino library and need to make it run reliably on their board.
 
-It is intended for Arduino hobbyists and makers who have exported an Edge Impulse project as an Arduino library and need to make it run reliably on their board.
+**TensorFlow Lite Micro** (often called **TFLite Micro** or **TFLM**) is a lightweight C++ runtime designed to run trained machine-learning models directly on microcontrollers and other embedded devices with limited memory.
 
-The ESP32-S3 is a practical platform for hobbyist and maker projects. It combines Wi-Fi, Bluetooth, a dual-core microcontroller, optional external PSRAM, and an accessible price point.
+A **tensor arena** is a single block of RAM reserved in advance for TFLite Micro. During inference, the runtime uses this block to store the model input and output tensors, intermediate activation data, persistent model data, and temporary working buffers. The arena must be large enough for all these allocations; if it is too small, TensorFlow Lite Micro cannot allocate the model tensors and inference fails.
+
+Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it possible to explore original and engaging on-device AI projects at a modest cost. Its dual-core processor, optional PSRAM, Wi-Fi and Bluetooth connectivity, and vector instructions for neural-network and signal-processing workloads provide a practical base for experiments such as image classification, sound recognition, gesture detection, sensor analysis, and connected edge-AI devices.
 
 Together with Edge Impulse, it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
 
-However, two parts can still require careful choices:
+However, two parts still require careful choices:
 
-1. Choosing a model that fits the board's real performance budget.
-2. Deploying the model and selecting the correct TensorFlow Lite Micro tensor arena size.
+1. Choosing an AI model in Edge Impulse that can actually run on an ESP32-S3. Edge Impulse offers many learning blocks, model architectures, and deployment options, but not every combination is suitable for the memory and performance limits of this board.
+2. Deploying the model as an Arduino library and selecting the correct TensorFlow Lite Micro tensor arena size.
 
-This repository focuses on the second point, but it also includes a useful real-world performance reference for the first one.
+This repository provides concrete and measured information for both points, helping avoid a situation where a model is trained successfully but cannot be deployed or run reliably on the ESP32-S3.
+
+It is the result of many tests carried out to find a working combination of model, input size, deployment settings, memory configuration, and tensor arena size. By making this work public, the goal is to save time for hobbyists and makers who want to start a similar project.
+
+> [!NOTE]
+> The example used in this repository is an image-classification model created in Edge Impulse to recognize each face of a die.
 
 ---
 
 ## 📌 A practical ESP32-S3 model reference
 
-After many tests, the following configuration was measured on an ESP32-S3:
+The example behind this repository is an Edge Impulse image-classification project designed to recognize each face of a die. After many tests, the following combination was found to run on an ESP32-S3:
 
-- Input images: **224 x 224**
+- Impulse image size: **224 x 224 RGB**
 - Edge Impulse learning block: **Transfer Learning (Images)**
 - Base model: **MobileNetV1 96x96 0.25**
 - DSP time: approximately **71 ms**
@@ -29,10 +36,39 @@ After many tests, the following configuration was measured on an ESP32-S3:
 - Total inference time: approximately **499 ms**
 - Practical rate: just under **2 images per second**
 
-This is a useful starting point when deciding whether an ESP32-S3 can meet the timing needs of an image-classification project.
+For this die-recognition project, a lower image resolution would probably have been sufficient. The purpose of configuring the Edge Impulse impulse at 224 x 224 was to explore the highest practical image resolution that could be processed on an ESP32-S3 for more demanding future projects.
 
-It is not a guaranteed result for every project. Camera capture, image conversion, number of labels, preprocessing, model configuration, ESP32 Arduino core version, board settings, screen rendering, Wi-Fi, logging, and other application code can change the final speed.
+In Edge Impulse, the image width and height selected in **Impulse Design > Create Impulse** define the image size processed by the Image data block and expected by the exported classifier. In this project, the impulse is configured for 224 x 224 RGB images.
 
+The `96x96` part of the `MobileNetV1 96x96 0.25` name refers to the model's pre-training and nominal input resolution. Edge Impulse documents 96 x 96 as the model's optimal input resolution, but it also allows another image resolution to be selected in the impulse. Using 224 x 224 therefore increases the amount of input data, preprocessing work, memory use, and usually inference cost compared with a 96 x 96 impulse.
+
+MobileNetV1 96x96 0.25 was the most suitable model tested for this ESP32-S3 project. It provided a workable balance between classification accuracy, memory use, and inference time.
+
+The `0.25` value is MobileNet's width multiplier. It reduces the number of channels in the neural network, reducing the model size, RAM requirement, and computation compared with wider MobileNet variants.
+
+This does not mean that MobileNetV1 96x96 0.25 is automatically the best choice for every ESP32-S3 project. The appropriate model depends on the required accuracy, the image size configured in the impulse, the number of classes, the available memory, and the acceptable neural-network inference time.
+
+Here, **neural-network inference time** is the time required by the ESP32-S3 to execute the trained neural network and produce the classification probabilities.
+
+It is reported separately from the DSP time in Edge Impulse:
+
+- **DSP time**: image preprocessing and feature preparation, such as converting the captured image into the numerical input buffer required by the classifier.
+- **NN time** (or classification time): execution of the neural network itself, from the prepared input tensor to the final class probabilities.
+
+For the reference test in this repository:
+
+```text
+DSP time: 71 ms
+NN time: 428 ms
+```
+
+The complete classification processing time was therefore approximately:
+
+```text
+71 ms + 428 ms = 499 ms
+```
+
+This measurement does not necessarily include camera capture, image acquisition, screen updates, Wi-Fi communication, logging, or other code running in the final application.
 ---
 
 ## 🧠 The tensor arena problem
