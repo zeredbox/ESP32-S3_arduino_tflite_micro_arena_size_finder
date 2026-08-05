@@ -8,14 +8,17 @@ A **tensor arena** is a single block of RAM reserved in advance for TFLite Micro
 
 Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it possible to explore original and engaging on-device AI projects at a modest cost. Its dual-core processor, optional PSRAM, Wi-Fi and Bluetooth connectivity, and vector instructions for neural-network and signal-processing workloads provide a practical base for experiments such as image classification, sound recognition, gesture detection, sensor analysis, and connected edge-AI devices.
 
-Together with Edge Impulse, it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
+Together with **Edge Impulse**, it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
 
 However, two parts still require careful choices:
 
-1. Choosing an AI model in Edge Impulse that can actually run on an ESP32-S3. Edge Impulse offers many learning blocks, model architectures, and deployment options, but not every combination is suitable for the memory and performance limits of this board.
-2. Deploying the model as an Arduino library and selecting the correct TensorFlow Lite Micro tensor arena size.
+1. **Choosing an AI model in Edge Impulse** that can actually run on an ESP32-S3. Edge Impulse offers many learning blocks, model architectures, and deployment options, but not every combination is suitable for the memory and performance limits of this board.
+2. Deploying the model as an Arduino library and **selecting the correct TensorFlow Lite Micro tensor arena size**.
 
-This repository provides concrete and measured information for both points, helping avoid a situation where a model is trained successfully but cannot be deployed or run reliably on the ESP32-S3.
+## 🎯 Why this repository exists
+
+> [!IMPORTANT]
+> This repository provides concrete and measured information for both points, helping avoid a situation where a model is trained successfully but cannot be deployed or run reliably on the ESP32-S3.
 
 It is the result of many tests carried out to find a working combination of model, input size, deployment settings, memory configuration, and tensor arena size. By making this work public, the goal is to save time for hobbyists and makers who want to start a similar project.
 
@@ -69,6 +72,7 @@ The complete classification processing time was therefore approximately:
 ```
 
 This measurement does not necessarily include camera capture, image acquisition, screen updates, Wi-Fi communication, logging, or other code running in the final application.
+
 ---
 
 ## 🧠 The tensor arena problem
