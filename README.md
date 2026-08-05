@@ -4,7 +4,7 @@
 
 This repository contains an Arduino sketch that measures the TensorFlow Lite Micro tensor arena used by an Edge Impulse model on an ESP32-S3 with PSRAM.
 
-It is intended for Arduino hobbyists and makers who have exported an [Edge Impulse](https://edgeimpulse.com/) project as an Arduino library and need to make it run reliably on their board.
+It is intended for Arduino hobbyists and makers who have exported an **[Edge Impulse](https://edgeimpulse.com/)** project as an Arduino library and need to make it run reliably on their board.
 
 **TensorFlow Lite Micro** (also called **TFLite Micro** or **TFLM**) is a lightweight C++ runtime designed to run trained machine-learning models directly on microcontrollers and other embedded devices with limited memory.
 
@@ -14,7 +14,7 @@ The arena must be large enough for all these allocations. If it is too small, Te
 
 Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it possible to explore original and engaging on-device AI projects at a modest cost. Its dual-core processor, optional PSRAM, Wi-Fi and Bluetooth connectivity, and support for AI and DSP-oriented instructions provide a practical base for image classification, sound recognition, gesture detection, sensor analysis, and connected edge-AI devices.
 
-Together with [Edge Impulse](https://edgeimpulse.com/), it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
+Together with **Edge Impulse**, it provides a workflow for collecting data, training a model, exporting an Arduino library, and running inference on a device without having to build the entire machine-learning deployment stack from scratch.
 
 ## 🎯 Why this repository exists
 
