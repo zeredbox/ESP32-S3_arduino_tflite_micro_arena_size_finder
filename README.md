@@ -181,19 +181,18 @@ You need:
 
 - An **ESP32-S3 N16R8 development board** with PSRAM.
 
-  This repository was tested with a **Goouuu ESP32-S3 N16R8**, a DevKitC-1–compatible board equipped with **16 MB of flash memory** and **8 MB of PSRAM**.
-
-  Other ESP32-S3 boards with PSRAM may also work, such as an ESP32-S3-DevKitC-1 N16R8 or another development board based on an ESP32-S3-WROOM-1 N16R8 module.
+  This repository was tested with a **Goouuu ESP32-S3 N16R8**, a DevKitC-1-compatible board equipped with **16 MB of flash memory** and **8 MB of PSRAM**.
+  Other ESP32-S3 N16R8 boards with PSRAM may also work, such as an ESP32-S3-WROOM-1 N16R8 module.
 
 > [!NOTE]
 > To keep this guide focused and reproducible, all Arduino IDE settings and technical recommendations in this repository are based on the **ESP32-S3 N16R8 configuration**: **16 MB flash** and **8 MB PSRAM**.
 >
-> If you use another ESP32-S3 board or another memory configuration, the sketch may still work, but you must adapt the Arduino IDE settings—especially **Board**, **Flash Size**, **PSRAM mode**, and **Partition Scheme**—to match your hardware.
+> If you use another ESP32-S3 board or another memory configuration, the sketch may still work, but you must adapt the Arduino IDE settings - especially **Board**, **Flash Size**, **PSRAM mode**, and **Partition Scheme** - to match your hardware.
 
 - Arduino IDE 2.x.
 - Espressif's ESP32 board package installed in Arduino IDE.
 - An Edge Impulse project exported as an Arduino library using TensorFlow Lite.
-- The `.ino` sketch from this repository.
+- The `ESP32-S3_arduino_tflite_micro_arena_size_finder.ino` sketch from this repository.
 
 ---
 
