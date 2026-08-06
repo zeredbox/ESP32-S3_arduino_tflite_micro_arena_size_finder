@@ -1,4 +1,4 @@
-# 🤖 Arduino ESP32-S3 + Edge Impulse: Find the Right Tensor Arena Size
+# Arduino ESP32-S3 + Edge Impulse: Find the Right Tensor Arena Size
 
 # 🚀 A Starting Point for Embedded AI on ESP32-S3
 ## A beginner-friendly guide to image classification with Edge Impulse and TensorFlow Lite Micro
