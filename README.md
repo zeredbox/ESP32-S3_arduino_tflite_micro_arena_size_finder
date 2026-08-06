@@ -200,7 +200,7 @@ You need:
 
 ### 📸 Create the image dataset
 
-![Create Impulse 224x224](images/dataset.PNG)
+![Create the dataset with 224x224 pictures](images/dataset.PNG)
 
 Before creating the impulse, build and label the dataset that will be used to train the model.
 
