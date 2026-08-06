@@ -231,7 +231,8 @@ Click **Save & train** to start training the model.
 
 > [!IMPORTANT]
 > Image-recognition quality depends primarily on the dataset: the number of images per class, accurate labels, sharpness, lighting conditions, camera angle, distance to the die, background variation, and how closely the training images match the real conditions in which the ESP32-S3 camera will be used. Include representative examples of every die face and avoid using near-identical images only.
-> > The model also plays an important role: it is the neural-network architecture that learns visual patterns from the training images and uses them to classify new camera images. A larger model can potentially recognize more complex patterns, but it requires more Flash memory, RAM, and processing time on the ESP32-S3.
+>
+> The model also plays an important role: it is the neural-network architecture that learns visual patterns from the training images and uses them to classify new camera images. A larger model can potentially recognize more complex patterns, but it requires more Flash memory, RAM, and processing time on the ESP32-S3.
 >
 > **MobileNetV1 96×96 0.25** is a compact neural-network architecture chosen as a practical compromise between recognition performance and the limited resources of an embedded device. According to Edge Impulse, it requires approximately 105.9 KB of RAM and 301.6 KB of ROM. This makes it well suited to deployment on the ESP32-S3 while leaving memory available for the camera image buffer, the TensorFlow Lite Micro tensor arena, and the rest of the application.
 >
