@@ -1,5 +1,18 @@
 # 🤖 Arduino ESP32-S3 + Edge Impulse: Find the Right Tensor Arena Size
 
+# 🚀 A Starting Point for Embedded AI on ESP32-S3
+
+This guide is a practical starting point for anyone who wants to begin building embedded AI applications on an ESP32-S3, including complete beginners.
+
+It explains the full workflow, from creating and labeling an image dataset in Edge Impulse to training, exporting, and deploying a TensorFlow Lite Micro model on an ESP32-S3. Along the way, it explains the key concepts needed to understand how an image-classification project works on a constrained embedded device.
+
+This project helps answer two crucial questions before deploying an AI model:
+
+1. **Which AI model can run on the ESP32-S3?**
+2. **How much TensorFlow Lite Micro tensor arena memory must be allocated for that model?**
+
+The example uses a dice-image-classification model, but the same method can be applied to many other camera-based embedded AI projects.
+
 ## 👋 Introduction
 
 This repository contains an **Arduino sketch** that measures the **TensorFlow Lite Micro tensor arena** used by an **Edge Impulse model** on an **ESP32-S3** with PSRAM.
