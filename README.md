@@ -200,6 +200,8 @@ You need:
 
 ### 📸 Create the image dataset
 
+![Create Impulse 224x224](images/dataset.PNG)
+
 Before creating the impulse, build and label the dataset that will be used to train the model.
 
 In Edge Impulse Studio, open the **Data acquisition** page. You can capture images directly from a connected camera or upload existing image files. For every image, select the correct label and make sure that each die face has its own class.
