@@ -198,6 +198,36 @@ You need:
 
 ## ⚠️ Step 1: Create and Export the Edge Impulse Model
 
+### 📸 Create the image dataset
+
+Before creating the impulse, build and label the dataset that will be used to train the model.
+
+In Edge Impulse Studio, open the **Data acquisition** page. You can capture images directly from a connected camera or upload existing image files. For every image, select the correct label and make sure that each die face has its own class.
+
+For this dice-recognition project, create the following classes: `one`, `two`, `three`, `four`, `five`, `six`, `background`.
+
+The `background` class is important. It contains images in which no die face should be recognized—for example, an empty white background, the table, the camera view without a die, or other irrelevant objects. It helps the model learn the difference between a die and its surroundings, reducing false detections.
+
+For close-up object classification, make the die occupy approximately 60% to 80% of the image. It should be large enough for its dots and edges to remain clear after the image is resized, but leave some visible background around it.
+
+> [!TIP]
+> If possible, use a simple, neutral, and consistent background, such as a white sheet of paper. Capture background images under the same lighting and camera conditions used during normal operation. Include this background as its own recognition class.
+
+For each die-face class, capture at least 30 to 50 images as a starting point; more images generally produce a more reliable model. Keep roughly the same number of images in every class, including the `background` class.
+
+Vary the images deliberately:
+
+- Change the die position and rotation.
+- Move the die slightly closer to or farther from the camera.
+- Vary the lighting intensity and direction.
+- Include small changes in shadows and framing.
+- Keep the die clearly visible and in focus.
+- Use images captured with the same OV2640 camera and setup that will be used on the ESP32-S3.
+
+Do not use only nearly identical photographs. The dataset must represent the real conditions in which the model will run. A model trained only with a perfectly centered die on a white background may fail when the die is rotated, shifted, partially shadowed, or viewed under different lighting.
+
+Use most images for **Training data** and reserve separate images for **Test data**. A practical starting split is approximately 80% training and 20% testing images.
+
 ### ⚙️ Create the impulse
 
 After creating and labeling your image dataset in the **Data acquisition** page, open **Impulse #x > Create impulse** to configure your image-classification impulse.
