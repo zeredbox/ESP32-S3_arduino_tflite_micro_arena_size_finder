@@ -301,22 +301,23 @@ Click **Save & train** to start training the model.
 >
 > **Data augmentation** improves robustness by creating modified training examples, such as small changes in crop, position, brightness, or orientation. It is especially useful with a small dataset, but it cannot compensate for images that are poorly labeled, too similar, blurry, or unrepresentative of real operating conditions.
 
-### 🧩 Use TensorFlow Lite, not EON Compiler
+### 📦 Export the Arduino library
 
-In Edge Impulse Studio, open **Deployment** and export the trained project as an **Arduino library** using **TensorFlow Lite**.
+In Edge Impulse Studio, open the **Deployment** page and configure the export as follows:
 
-For this procedure, do **not** use the EON compiler or the EON-optimized variant.
+1. Under **Deployment target**, select **Arduino library**.
+2. Under **Inference engine**, select **TensorFlow Lite**.
+3. Under **Model optimizations and performance**, select **Quantized (int8)**.
+4. Do **not** select **Unoptimized (float32)**.
+5. Click **Build**.
+6. Wait for Edge Impulse to generate and download the `.zip` Arduino library.
 
-1. Open your Edge Impulse project.
-2. Go to **Deployment**.
-3. Select **Arduino library**.
-4. Set the inference engine or model optimization to **TensorFlow Lite**.
-5. Do not select the EON-optimized version for this workflow.
-6. Click **Build**.
-7. Download the generated `.zip` Arduino library.
+Do not extract the downloaded ZIP file. It will be imported directly into the Arduino IDE in the next step.
 
-> [!WARNING]
-> This sketch measures `tflite::MicroInterpreter::arena_used_bytes()`, so it applies to the TensorFlow Lite Micro interpreter path. EON and TensorFlow Lite Micro are different deployment approaches. As of August 2026, use the standard TensorFlow Lite Micro path for this Arduino ESP32-S3 debugging and arena-sizing workflow.
+> [!IMPORTANT]
+> Select **TensorFlow Lite**, not the EON compiler / EON-optimized variant. This project measures the memory required by the **TensorFlow Lite Micro tensor arena**. An EON-compiled model uses a different inference implementation and memory layout, so its result is not applicable to this tensor-arena-size finder.
+>
+> Select **Quantized (int8)**, not **Unoptimized (float32)**. The two variants are different models and do not have the same memory requirements, inference speed, Flash usage, or possibly recognition accuracy. The tensor arena size measured later must correspond to the exact model variant that you will deploy.
 
 ---
 
