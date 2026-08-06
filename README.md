@@ -214,7 +214,7 @@ You need:
 
 ## ⚠️ Step 1: Create and Export the Edge Impulse Model
 
-### 📸 Create the image dataset
+### 1.1 📸 Create the image dataset
 
 ![Create the dataset with 224x224 pictures](images/dataset.PNG)
 
@@ -246,7 +246,7 @@ Do not use only nearly identical photographs. The dataset must represent the rea
 
 Use most images for **Training data** and reserve separate images for **Test data**. A practical starting split is approximately 80% training and 20% testing images.
 
-### ⚙️ Create the impulse
+### 1.2 ⚙️ Create the impulse
 
 After creating and labeling your image dataset in the **Data acquisition** page, open **Impulse #x > Create impulse** to configure your image-classification impulse.
 
@@ -263,7 +263,7 @@ After creating and labeling your image dataset in the **Data acquisition** page,
 
 The resulting model expects 224×224 pixel images captured by the camera connected to the ESP32-S3.
 
-### 🧠 Configure the Transfer Learning model
+### 1.3 🧠 Configure the Transfer Learning model
 
 <table>
 <tr>
@@ -301,7 +301,7 @@ Click **Save & train** to start training the model.
 >
 > **Data augmentation** improves robustness by creating modified training examples, such as small changes in crop, position, brightness, or orientation. It is especially useful with a small dataset, but it cannot compensate for images that are poorly labeled, too similar, blurry, or unrepresentative of real operating conditions.
 
-### 📦 Select the deployment target
+### 1.4 📦 Select the deployment target
 
 On the **Deployment** page, configure the export as follows:
 
