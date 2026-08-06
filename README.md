@@ -724,6 +724,22 @@ The tensor arena is normally reserved statically in internal SRAM by the Edge Im
 
 ## 🩺 Troubleshooting
 
+### ⚠️ Camera compatibility and troubleshooting
+
+This repository focuses on TensorFlow Lite Micro tensor-arena sizing. It assumes that the camera can already capture frames reliably before any machine-learning processing is added.
+
+Before calling `run_classifier()`, validate the camera separately with a minimal sketch:
+
+1. Initialize the OV2640 camera with the exact GPIO pin mapping for your board.
+2. Capture and return camera frames repeatedly.
+3. Confirm that the chosen frame size and pixel format work reliably.
+4. Only then add image conversion, resizing, and TensorFlow Lite Micro inference.
+
+> [!WARNING]
+> A model input size such as 96×96 or 224×224 is not necessarily a camera capture mode. The camera may capture a supported source frame size, then the application converts and resizes that frame into the model input buffer.
+>
+> Do not assume that an OV2640 board supports every resolution or raw pixel format reliably. Verify JPEG, RGB565, and the selected frame size with the exact board, camera driver, Arduino-ESP32 core version, and pin configuration before integrating Edge Impulse.
+
 ### ⚡ PSRAM total is zero
 
 Example:
