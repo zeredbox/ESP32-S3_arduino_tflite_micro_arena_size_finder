@@ -215,6 +215,28 @@ After creating and labeling your image dataset in the **Data acquisition** page,
 
 The resulting model expects 224×224 pixel images captured by the camera connected to the ESP32-S3.
 
+### 🧠 Configure the Transfer Learning model
+
+Open the **Transfer Learning** tab to configure and train the image-classification model.
+
+The settings below are a useful starting point, not fixed requirements. Train the model first, review its performance, then adjust the number of training cycles, learning rate, augmentation settings, or model architecture if necessary.
+
+- **Number of training cycles:** start with `50`.
+- **Learning rate:** start with `0.001`.
+- **Training processor:** select **CPU**.
+- **Data augmentation:** enable this option if you have only a small number of training images—such as 15 to 20 images per class. It creates modified versions of the training images, for example with small changes in position, crop, or brightness, helping the model generalize better. It does not replace collecting real, varied images.
+- Under **Neural network architecture**, click **Choose a different model** and select **MobileNetV1 96x96 0.25**. This compact model is a good choice for an ESP32-S3 because it uses substantially less RAM and flash memory than larger architectures.
+
+Click **Save & train** to start training the model.
+
+> [!IMPORTANT]
+> Image-recognition quality depends primarily on the dataset: the number of images per class, accurate labels, sharpness, lighting conditions, camera angle, distance to the die, background variation, and how closely the training images match the real conditions in which the ESP32-S3 camera will be used. Include representative examples of every die face and avoid using near-identical images only.
+> > The model also plays an important role: it is the neural-network architecture that learns visual patterns from the training images and uses them to classify new camera images. A larger model can potentially recognize more complex patterns, but it requires more Flash memory, RAM, and processing time on the ESP32-S3.
+>
+> **MobileNetV1 96×96 0.25** is a compact neural-network architecture chosen as a practical compromise between recognition performance and the limited resources of an embedded device. According to Edge Impulse, it requires approximately 105.9 KB of RAM and 301.6 KB of ROM. This makes it well suited to deployment on the ESP32-S3 while leaving memory available for the camera image buffer, the TensorFlow Lite Micro tensor arena, and the rest of the application.
+>
+> **Data augmentation** improves robustness by creating modified training examples, such as small changes in crop, position, brightness, or orientation. It is especially useful with a small dataset, but it cannot compensate for images that are poorly labeled, too similar, blurry, or unrepresentative of real operating conditions.
+
 ### 🧩 Use TensorFlow Lite, not EON Compiler
 
 In Edge Impulse Studio, open **Deployment** and export the trained project as an **Arduino library** using **TensorFlow Lite**.
