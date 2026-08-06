@@ -312,6 +312,8 @@ On the **Deployment** page, configure the export as follows:
 
 Do not extract the downloaded ZIP file. It will be imported directly into the Arduino IDE in the next step.
 
+![Deployement target](images/Deployment_target.PNG)
+
 > [!IMPORTANT]
 > As of August 2026, select **TensorFlow Lite** and do **not** use the **EON compiler** / EON-optimized variant for this Arduino ESP32-S3 workflow. EON deployments have caused compatibility and memory-management problems in Arduino-based ESP32-S3 projects, including incorrect inference results, crashes, reboot loops, and corrupted-heap errors. **TensorFlow Lite Micro is the more reliable option for this procedure.**
 > This repository also measures the TensorFlow Lite Micro tensor arena with `arena_used_bytes()`. The measured result therefore applies only to the TensorFlow Lite model and runtime, not to an EON-compiled model.
