@@ -11,7 +11,7 @@ Together with **[Edge Impulse](https://edgeimpulse.com/)**, ESP32-S3 provides a 
 **This repository is intended for Arduino hobbyists and makers who have created an AI model with Edge Impulse and want to deploy it reliably on an ESP32-S3 as an Arduino library.**
 
 > [!NOTE]
-> <table border="0">
+> <table>
 > <tr>
 > <td valign="top">
 >
