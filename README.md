@@ -217,6 +217,10 @@ The resulting model expects 224×224 pixel images captured by the camera connect
 
 ### 🧠 Configure the Transfer Learning model
 
+<table>
+<tr>
+<td valign="top">
+
 Open the **Transfer Learning** tab to configure and train the image-classification model.
 
 The settings below are a useful starting point, not fixed requirements. Train the model first, review its performance, then adjust the number of training cycles, learning rate, augmentation settings, or model architecture if necessary.
@@ -228,6 +232,17 @@ The settings below are a useful starting point, not fixed requirements. Train th
 - Under **Neural network architecture**, click **Choose a different model** and select **MobileNetV1 96x96 0.25**. This compact model is a good choice for an ESP32-S3 because it uses substantially less RAM and flash memory than larger architectures.
 
 Click **Save & train** to start training the model.
+
+</td>
+<td width="360" valign="top">
+
+<img src="pictures/transfer-_learnong.PNG"
+     alt="Edge Impulse Transfer Learning configuration"
+     width="340">
+
+</td>
+</tr>
+</table>
 
 > [!IMPORTANT]
 > Image-recognition quality depends primarily on the dataset: the number of images per class, accurate labels, sharpness, lighting conditions, camera angle, distance to the die, background variation, and how closely the training images match the real conditions in which the ESP32-S3 camera will be used. Include representative examples of every die face and avoid using near-identical images only.
