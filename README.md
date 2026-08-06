@@ -236,7 +236,7 @@ Click **Save & train** to start training the model.
 </td>
 <td width="360" valign="top">
 
-<img src="pictures/Transfer_learning.PNG"
+<img src="images/Transfer_learning.PNG"
      alt="Edge Impulse Transfer Learning configuration"
      width="340">
 
