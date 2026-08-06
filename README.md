@@ -214,7 +214,13 @@ You need:
 
 ## ⚠️ Step 1: Create and Export the Edge Impulse Model
 
-### 1.1 📸 Create the image dataset
+### 1.1 🛠️ Create the Edge Impulse project
+
+In Edge Impulse Studio, click **Create new project**, give the project a name, then select **Espressif ESP-EYE (ESP32 240MHz)** as the target device.
+
+Although this project runs on an ESP32-S3 camera board rather than the original ESP-EYE, this target is used as a practical starting point in Edge Impulse to obtain ESP32-oriented performance estimates. The final compatibility and memory requirement must still be verified on the actual ESP32-S3 board.
+
+### 1.2 📸 Create the image dataset
 
 ![Create the dataset with 224x224 pictures](images/dataset.PNG)
 
@@ -246,7 +252,7 @@ Do not use only nearly identical photographs. The dataset must represent the rea
 
 Use most images for **Training data** and reserve separate images for **Test data**. A practical starting split is approximately 80% training and 20% testing images.
 
-### 1.2 ⚙️ Create the impulse
+### 1.3 ⚙️ Create the impulse
 
 After creating and labeling your image dataset in the **Data acquisition** page, open **Impulse #x > Create impulse** to configure your image-classification impulse.
 
@@ -263,7 +269,7 @@ After creating and labeling your image dataset in the **Data acquisition** page,
 
 The resulting model expects 224×224 pixel images captured by the camera connected to the ESP32-S3.
 
-### 1.3 🧠 Configure the Transfer Learning model
+### 1.4 🧠 Configure the Transfer Learning model
 
 <table>
 <tr>
@@ -301,7 +307,7 @@ Click **Save & train** to start training the model.
 >
 > **Data augmentation** improves robustness by creating modified training examples, such as small changes in crop, position, brightness, or orientation. It is especially useful with a small dataset, but it cannot compensate for images that are poorly labeled, too similar, blurry, or unrepresentative of real operating conditions.
 
-### 1.4 📦 Select the deployment target
+### 1.5 📦 Select the deployment target
 
 On the **Deployment** page, configure the export as follows:
 
