@@ -196,26 +196,26 @@ You need:
 
 ---
 
-⚠️ Step 1: Create and Export the Edge Impulse Model
+## ⚠️ Step 1: Create and Export the Edge Impulse Model
 
 ### ⚙️ Create the impulse
 
-Before exporting the library, create and train an image-classification impulse in Edge Impulse Studio:
+After creating and labeling your image dataset in the **Data acquisition** page, open **Impulse #x > Create impulse** to configure your image-classification impulse.
 
-1. Open **Impulse design > Create impulse**.
+![Create Impulse 224x224](images/Edge-Impulse_Create-Impulse.PNG)
+
+1. Open **Impulse #x > Create impulse**.
 2. Set both **Image width** and **Image height** to `224`.
 3. Add the **Images** processing block.
 4. Add the **Transfer Learning (Images)** learning block.
 5. Click **Save impulse**.
 6. Open the **Image** page, select the appropriate color depth for your camera (usually **RGB**), then save the parameters.
-7. Generate features, configure the Transfer Learning model, and train it with your labeled images.
+7. On the same page, open the **Generate features** tab and click **Generate features**.
+8. Open the **Transfer Learning** tab, configure the model, and train it with your labeled images.
 
 The resulting model expects 224×224 pixel images captured by the camera connected to the ESP32-S3.
 
-![Create Impulse 224x224](images/Edge-Impulse_Create-Impulse.PNG)
-
-
-### 🧩 Use TensorFlow Lite, not EON
+### 🧩 Use TensorFlow Lite, not EON Compiler
 
 In Edge Impulse Studio, open **Deployment** and export the trained project as an **Arduino library** using **TensorFlow Lite**.
 
