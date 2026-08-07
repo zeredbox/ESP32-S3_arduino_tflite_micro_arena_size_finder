@@ -436,85 +436,26 @@ extern const size_t tflite_learn_1077716_45_arena_size;
 > [!IMPORTANT]
 > Do not invent or simplify the generated arena-size symbol. Copy it exactly from your own `tflite_learn_*.h` file, including every number and underscore. Each Edge Impulse export can generate a different symbol name.
 
-
-### 🔎 Find your arena symbol
-
-Then open the file whose name matches:
-
-```text
-tflite_learn_*.h
-```
-
-Search for:
-
-```text
-_arena_size
-```
-
-For example, the file may contain this declaration:
-
-```cpp
-extern const size_t tflite_learn_1072522_47_arena_size;
-```
-
-In that case, replace the placeholder in the sketch with:
-
-```cpp
-extern con
-
-
-
-Open:
-
-```text
-...\Arduino\libraries\<your-project-name>\src\tflite-model\
-```
-
-Look for a file similar to:
-
-```text
-tflite_learn_1077716_45.h
-```
-
-Open it and search for:
-
-```text
-arena_size
-```
-
-You should find something similar to:
-
-```cpp
-const size_t tflite_learn_1077716_45_arena_size = 894991;
-```
-
-Copy the exact symbol name into the Arduino sketch:
-
-```cpp
-extern const size_t tflite_learn_1077716_45_arena_size;
-```
-
-> [!NOTE]
-> The numbers and names are model-specific. Do not copy the example numbers unless your own exported library uses them.
-
----
-
 ## 📏 Step 5: Set a large temporary arena
 
-Stay in the same model header:
+Stay in the same folder:
 
 ```text
 ...\Arduino\libraries\<your-project-name>\src\tflite-model\
-tflite_learn_XXXXXXX_ZZ.h
 ```
 
-Search for the arena size definitions.
+and open th file
+```text
+tflite_learn_XXXXXXX_ZZ.h
+```
+In our example
+'tflite_learn_1077716_45.h'
 
-They may initially look like this:
+Search for the arena size definitions. They may initially look like this:
 
 ```cpp
-#define EI_CLASSIFIER_TFLITE_LEARN_1077716_45_ARENA_SIZE 40960
-const size_t tflite_learn_1077716_45_arena_size = 40960;
+#define EI_CLASSIFIER_TFLITE_LEARN_1077716_45_ARENA_SIZE 519232
+const size_t tflite_learn_1077716_45_arena_size = 519232;
 ```
 
 For the first test, set **both values** to a deliberately large temporary value:
