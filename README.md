@@ -473,7 +473,7 @@ This gives TensorFlow Lite Micro enough memory to allocate the model tensors and
 > [!IMPORTANT]
 > This configuration is temporary. Both lines must use **exactly the same value**.
 
-## 🧪 Step 6: Add the debug line
+## 🔍 Step 6: Add a debug line to show actual tensor-arena usage
 
 Open this Edge Impulse SDK file:
 
