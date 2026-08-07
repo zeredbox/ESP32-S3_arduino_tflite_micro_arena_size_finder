@@ -102,9 +102,10 @@ The example behind this repository is an Edge Impulse image-classification proje
 - Edge Impulse learning block: **Transfer Learning (Images)**
 - Base model: **MobileNetV1 96x96 0.25**
 - DSP time: approximately **71 ms**
-- Neural-network classification time: approximately **428 ms**
-- Total inference time: approximately **499 ms**
-- Practical rate: just under **2 images per second**
+- Neural-network classification time: approximately **429 ms**
+- Total inference time: approximately **500 ms**
+- Theoretical inference rate: approximately **2 images per second**
+- Practical rate: close to **2 images per second**, before including camera capture, image conversion, display, Wi-Fi, logging, or other application tasks.
 
 For this dice recognition project, a lower image resolution or grayscale images instead of RGB would probably have been sufficient, reducing the model's memory requirements and inference workload. The purpose of configuring the Edge Impulse impulse at 224 x 224 RGB was to explore the highest practical image resolution that could be processed on an ESP32-S3 for more demanding future projects.
 
@@ -124,19 +125,19 @@ It is reported separately from the DSP time in Edge Impulse:
 - **NN time** (or classification time): execution of the neural network itself, from the prepared input tensor to the final class probabilities.
 
 For the reference test in this repository:
-
 ```text
 DSP time: 71 ms
-NN time: 428 ms
+NN time: 429 ms
 ```
 
 The complete classification processing time was therefore approximately:
-
 ```text
-71 ms + 428 ms = 499 ms
+71 ms + 429 ms = 500 ms
 ```
 
-This measurement does not necessarily include camera capture, image acquisition, screen updates, Wi-Fi communication, logging, or other code running in the final application.
+**This corresponds roughly to a theoretical maximum of 2 inferences per second.**
+
+The real end-to-end rate can be lower because a complete project may also need to capture an image, convert pixels, update a display, write logs, communicate over Wi-Fi, or perform other work between inferences.
 
 ---
 
@@ -554,9 +555,18 @@ This is the measured tensor arena use for that model. Do not assume your own mod
 ## ➕ Step 8: Calculate the final arena size
 
 Use this rule:
-
 ```text
 final arena size = M + safety margin
+```
+
+For the reference test in this repository, the measured value is:
+```text
+DEBUG: Tflite arena used bytes: 536044
+```
+
+Therefore:
+```text
+M = 536044 bytes
 ```
 
 A margin of 16 kB to 64 kB is usually a practical starting range:
@@ -567,51 +577,48 @@ A margin of 16 kB to 64 kB is usually a practical starting range:
 | 40 kB | 40,960 bytes | Moderate buffer |
 | 64 kB | 65,536 bytes | Comfortable buffer |
 
-For the example measurement `M = 536059`:
+For the reference measurement `M = 536044`:
 
 | Safety margin | Calculation | Final arena size |
 |---|---:|---:|
-| 16 kB | 536059 + 16384 | 552443 bytes |
-| 40 kB | 536059 + 40960 | 577019 bytes |
-| 64 kB | 536059 + 65536 | 601595 bytes |
+| 16 kB | 536044 + 16384 | 552428 bytes |
+| 40 kB | 536044 + 40960 | 577004 bytes |
+| 64 kB | 536044 + 65536 | 601580 bytes |
 
-You can also choose an easy-to-read binary-aligned number above the measured requirement.
+You can also choose an easy-to-read binary-aligned value above the measured
+requirement.
 
 For example:
-
 ```text
 564 kB = 577536 bytes
 ```
 
 That provides:
-
 ```text
-577536 - 536059 = 41477 bytes
+577536 - 536044 = 41492 bytes
 ```
 
-of safety margin.
+of safety margin, which is slightly more than 40 kB.
 
-For the example model, a readable final configuration could be:
-
+For the reference model, a readable final configuration could be:
 ```cpp
-#define EI_CLASSIFIER_TFLITE_LEARN_1077716_45_ARENA_SIZE 577536
-const size_t tflite_learn_1077716_45_arena_size = 577536;
+#define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 577536
+const size_t tflite_learn_1072522_47_arena_size = 577536;
 ```
 
-Replace the temporary `1000000` values in the same `tflite_learn_XXXXXXX_ZZ.h` file.
+Replace the temporary `1000000` values in the same
+`tflite_learn_1072522_47.h` file.
 
 Then compile and upload the sketch again.
 
 A successful final test should still display:
-
 ```text
 run_classifier() return code  : 0 (OK)
 ```
 
 and:
-
 ```text
-DEBUG: Tflite arena used bytes: <M>
+DEBUG: Tflite arena used bytes: 536044
 ```
 
 > [!WARNING]
@@ -621,9 +628,11 @@ DEBUG: Tflite arena used bytes: <M>
 
 ## 🖥️ Example serial output
 
-A successful measurement run can look like this:
+A successful measurement run for the reference model looks like this:
 
 ```text
+HELLO FROM SETUP
+
 Arduino ESP32-S3 + Edge Impulse - Tensor Arena Size Finder
 ------------------------------------------------------------
 === ESP32-S3 Memory Test ===
@@ -633,14 +642,21 @@ PSRAM free                   : 8386076 bytes
 PSRAM total                  : 8388608 bytes
 
 === Current Edge Impulse Arena ===
-Arena configured in tflite_learn_xxx.h : 894991 bytes
+Arena configured in tflite_learn_xxx.h : 1000000 bytes
+Arena / (heap free + arena)  : 74.5%
+Arena / max contiguous block : 348.8%
+
+Note:
+  - The arena is reserved statically in SRAM by the EI SDK.
+  - Our PSRAM measurements only see dynamic allocations, such as
+    the input feature buffer we allocate below.
 
 --- Allocating NN input buffer in PSRAM ---
 Planned input buffer size     : 602112 bytes
 Input buffer allocated in PSRAM: 602112 bytes OK
 
 --- Running single inference (run_classifier) ---
-DEBUG: Tflite arena used bytes: 536059
+DEBUG: Tflite arena used bytes: 536044
 
 run_classifier() return code  : 0 (OK)
 Heap used during inference    : 432 bytes
@@ -648,27 +664,76 @@ PSRAM used during inference   : 0 bytes
 Heap free after inference     : 342216 bytes
 PSRAM free after inference    : 7783948 bytes
 
-DSP time: 71 ms, NN time: 428 ms
+--- Classification result (dummy input) ---
+  0: 0.934
+  1: 0.059
+  2: 0.000
+  3: 0.004
+  4: 0.000
+  5: 0.000
+  6: 0.004
+
+DSP time: 71 ms, NN time: 429 ms
 ```
+
+The important lines are:
+```text
+DEBUG: Tflite arena used bytes: 536044
+run_classifier() return code  : 0 (OK)
+```
+
+The first line provides the real tensor arena requirement for this model. The second line confirms that inference completed successfully.
+
+The configured arena is temporarily set to `1000000` bytes for this measurement run. After measuring the real requirement, it can be reduced to a final value such as `577536` bytes (564 kB), while retaining a safety margin.
 
 ### 📖 How to read this output
 
 | Output | Meaning |
 |---|---|
-| `PSRAM total : 8388608 bytes` | 8 MB PSRAM is available |
-| `Input buffer allocated in PSRAM` | The large input feature buffer is stored in PSRAM |
-| `DEBUG: Tflite arena used bytes: 536059` | This is the measured tensor arena requirement `M` |
-| `run_classifier() return code : 0 (OK)` | Inference completed successfully |
-| `DSP time: 71 ms, NN time: 428 ms` | Timing for preprocessing and neural-network classification |
-| `Arena configured ... : 894991 bytes` | The configured arena is larger than required and can be reduced after adding a margin |
+| `PSRAM total : 8388608 bytes` | 8 MiB of PSRAM is available (commonly described as 8 MB) |
+| `Input buffer allocated in PSRAM: 602112 bytes OK` | The 602112-byte input feature buffer was successfully allocated in PSRAM |
+| `DEBUG: Tflite arena used bytes: 536044` | This is the measured tensor arena requirement `M` for the reference model |
+| `run_classifier() return code : 0 (OK)` | Tensor allocation and inference completed successfully |
+| `DSP time: 71 ms, NN time: 429 ms` | DSP preprocessing took 71 ms; neural-network classification took 429 ms |
+| `Arena configured in tflite_learn_xxx.h : 1000000 bytes` | The arena is temporarily oversized for the measurement run and can now be reduced after adding a safety margin |
+| `Heap free after inference : 342216 bytes` | Internal SRAM heap remains available for dynamic allocations after inference |
+| `PSRAM free after inference : 7783948 bytes` | PSRAM remains available after allocating the input feature buffer and running inference |
 
-The input buffer was allocated in PSRAM. Therefore, its approximately 602 kB allocation does not consume the internal SRAM heap reported by:
-
+The input buffer was allocated in PSRAM. Therefore, its `602112`-byte allocation
+does not consume the internal SRAM heap reported by:
 ```cpp
 ESP.getFreeHeap()
 ```
 
-The tensor arena is normally reserved statically in internal SRAM by the Edge Impulse / TensorFlow Lite Micro code.
+The tensor arena is normally reserved statically in internal SRAM by the Edge Impulse / TensorFlow Lite Micro code. This is why the configured arena size does not appear as a dynamic PSRAM allocation in this test.
+
+For this measurement run, the arena was intentionally configured at:
+```text
+1000000 bytes
+```
+
+The actual measured requirement was:
+```text
+536044 bytes
+```
+
+The final arena can therefore be reduced to a value above `536044` bytes, with a safety margin. For example, `577536` bytes (564 kB) leaves a margin of
+`41492` bytes.
+
+> [!IMPORTANT]
+> ## 🎯 The value to keep
+>
+> For this reference model, the most important line in the Serial Monitor is:
+>> ```text
+> DEBUG: Tflite arena used bytes: 536044
+> ```
+>
+> This means that the real minimum TensorFlow Lite Micro tensor arena requirement is:
+>
+> ```text
+> M = 536044 bytes
+> ```
+> Do **not** configure the final arena below `536044` bytes for this exact model. A practical final value for this test is `577536` bytes (564 kB), which keeps a safety margin of `41492` bytes.
 
 ---
 
