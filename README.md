@@ -375,18 +375,25 @@ Connect your ESP32-S3 and check the **Tools** menu in Arduino IDE.
 
 ---
 
-## ✏️ Step 4: Adapt the sketch
+## ✏️ Step 4: Adapt the sketch to your own Edge Impulse Arduino library
 
-Open the sketch from this repository.
-
-Near the beginning, find these two placeholder lines:
+Open the sketch from this repository. Near the beginning, find these two placeholder lines:
 
 ```cpp
-#include <YOURMODEL_inferencing.h>          // <-- CHANGE THIS
+#include <YOUR_LIBRARY_inferencing.h>          // <-- CHANGE THIS
 extern const size_t tflite_learn_XXXXXXX_ZZ_arena_size;   // <-- CHANGE THIS
 ```
 
 You must replace both placeholders with names from your own Edge Impulse Arduino library.
+```cpp
+//#include <YOUR_LIBRARY_inferencing.h>          // <-- CHANGE THIS
+#include <Dice_inferencing.h>
+
+//extern const size_t tflite_learn_XXXXXXX_ZZ_arena_size;   // <-- CHANGE THIS
+extern const size_t tflite_learn_1072522_47_arena_size;   
+```
+Find this symbol in the exported Arduino library, in a file named:
+...\Arduino\libraries\<your-project-name>\src\tflite-model\tflite_learn_*.h
 
 ### 📄 Find your inference header
 
