@@ -348,10 +348,10 @@ C:\Users\<your-user-name>\Documents\Arduino\libraries\<your-project-name>\
 Inside this library you will find:
 
 ```text
-src/
-src/<your-model>_inferencing.h
-src/tflite-model/
-src/edge-impulse-sdk/
+src\
+src`\<your-model>_inferencing.h
+src\tflite-model\
+src\edge-impulse-sdk\
 ```
 These folders are important later in the process.
 
