@@ -365,30 +365,10 @@ Connect your ESP32-S3 and check the **Tools** menu in Arduino IDE.
 |---|---|---|
 | **Tools > Board** | Select your actual ESP32-S3 board, for example `ESP32S3 Dev Module` or `XIAO ESP32S3 Sense` | The selected board controls available flash, PSRAM, USB, upload, and partition options |
 | **Tools > Port** | Select the serial port assigned to the ESP32-S3 | Required for upload and Serial Monitor output |
-| **Tools > Flash Size** | `8MB (64Mb)` if your board has 8 MB flash | Must match the installed ESP32-S3 module |
+| **Tools > Flash Size** | `16MB (128Mb)` for an ESP32-S3 N16R8 board | `N16R8` indicates 16 MB of Flash memory and 8 MB of PSRAM |
 | **Tools > PSRAM** | Enable the correct PSRAM option, often `OPI PSRAM` | The sketch allocates the input buffer in PSRAM |
-| **Tools > Partition Scheme** | `8M with spiffs (3MB APP / 1.5MB SPIFFS)` as a starting point | Provides approximately 3 MB for firmware and 1.5 MB for SPIFFS files |
+| **Tools > Partition Scheme** | '16M Flash (3MB APP / 9MB FATFS)' | Ensures that the partition table is configured for the board’s full 16 MB of Flash memory |
 | **Tools > Core Debug Level** | `None` or `Error` | Optional; reduces unrelated serial messages |
-
-### 🗂️ About `8M with spiffs`
-
-For most Edge Impulse projects on an ESP32-S3 with 8 MB flash, this is a reasonable initial choice:
-
-```text
-8M with spiffs (3MB APP / 1.5MB SPIFFS)
-```
-
-It provides approximately:
-
-- **3 MB APP**: application firmware, including the Edge Impulse model and libraries.
-- **1.5 MB SPIFFS**: optional flash filesystem for images, configuration files, logs, and other files.
-
-It is not necessarily the best choice for every project:
-
-- Choose a larger application partition if the Arduino compiler reports that the sketch is too large.
-- Keep SPIFFS storage if your project needs files stored in flash.
-- Use a custom `partitions.csv` later if you need a different flash-memory layout.
-- Use an OTA-oriented partition scheme only if the project needs over-the-air firmware updates.
 
 > [!TIP]
 > The tensor arena uses **RAM**, not flash partition space. Changing the partition scheme does not automatically make the tensor arena larger.
