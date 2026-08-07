@@ -521,14 +521,15 @@ ei_printf("DEBUG: Tflite arena used bytes: %d\n",
 
 ## 🚀 Step 7: Compile, upload, and read the key value
 
-1. Open the `.ino` sketch in Arduino IDE.
-2. Click **Verify** to compile.
-3. Click **Upload** to flash the ESP32-S3.
-4. Open **Tools > Serial Monitor**.
-5. Set the baud rate to **115200**.
+1. Open the modified `.ino` sketch in the Arduino IDE.
+2. Click **Upload** to flash the ESP32-S3.
+4. Open **Tools > Serial Monitor** and set the baud rate to **115200**.
 6. If no output appears, press the board's **Reset** button.
-7. Look for this key line:
 
+> [!NOTE]
+> The first compilation can take more than 10 minutes because the Arduino IDE must compile the Edge Impulse library, TensorFlow Lite Micro, and their dependencies. Later compilations are usually faster.
+
+Look for this key line:
 ```text
 DEBUG: Tflite arena used bytes: <M>
 ```
