@@ -367,7 +367,7 @@ Connect your ESP32-S3 and check the **Tools** menu in Arduino IDE.
 | **Tools > Port** | Select the serial port assigned to the ESP32-S3 | Required for upload and Serial Monitor output |
 | **Tools > Flash Size** | `16MB (128Mb)` for an ESP32-S3 N16R8 board | `N16R8` indicates 16 MB of Flash memory and 8 MB of PSRAM |
 | **Tools > PSRAM** | Enable the correct PSRAM option, often `OPI PSRAM` | The sketch allocates the input buffer in PSRAM |
-| **Tools > Partition Scheme** | '16M Flash (3MB APP / 9MB FATFS)' | Ensures that the partition table is configured for the board’s full 16 MB of Flash memory |
+| **Tools > Partition Scheme** | '16M Flash (3MB APP / 9.9MB FATFS)' | Ensures that the partition table is configured for the board’s full 16 MB of Flash memory |
 | **Tools > Core Debug Level** | `None` or `Error` | Optional; reduces unrelated serial messages |
 
 > [!TIP]
