@@ -478,19 +478,11 @@ This gives TensorFlow Lite Micro enough memory to allocate the model tensors and
 Open this Edge Impulse SDK file:
 
 ```text
-...\Arduino\libraries\<your-project-name>\src\
-edge-impulse-sdk\classifier\inferencing_engines\tflite_micro.h
-```
-
-On Windows, it may look like:
-
-```text
-C:\Users\<your-user-name>\Documents\Arduino\libraries\<your-project-name>\
+...\Arduino\libraries\<your-project-name>\
 src\edge-impulse-sdk\classifier\inferencing_engines\tflite_micro.h
 ```
 
 Search for:
-
 ```cpp
 TfLiteStatus allocate_status = interpreter->AllocateTensors(true);
 if (allocate_status != kTfLiteOk) {
@@ -500,7 +492,6 @@ if (allocate_status != kTfLiteOk) {
 ```
 
 Immediately after that `if` block, add:
-
 ```cpp
 // Debug: real tensor arena usage for this model.
 // Printed after TFLite Micro has allocated the model tensors.
@@ -509,7 +500,6 @@ ei_printf("DEBUG: Tflite arena used bytes: %d\n",
 ```
 
 The full section should become:
-
 ```cpp
 TfLiteStatus allocate_status = interpreter->AllocateTensors(true);
 if (allocate_status != kTfLiteOk) {
@@ -526,9 +516,6 @@ ei_printf("DEBUG: Tflite arena used bytes: %d\n",
 `interpreter` is a `tflite::MicroInterpreter` object. Its `arena_used_bytes()` method reports the tensor-arena use after tensor allocation.
 
 `ei_printf()` is sent to the Arduino serial output, so the result appears in the Arduino IDE Serial Monitor.
-
-> [!TIP]
-> If you cannot find the correct location, use your editor's global search / “Find in Files” function and search for `AllocateTensors(true)`.
 
 ---
 
