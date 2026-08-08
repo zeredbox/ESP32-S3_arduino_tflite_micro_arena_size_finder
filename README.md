@@ -253,7 +253,7 @@ You need:
 - An **ESP32-S3 N16R8 development board** with PSRAM.
 
   This repository was tested with a **Goouuu ESP32-S3 N16R8**, a DevKitC-1-compatible board equipped with **16 MB of flash memory** and **8 MB of PSRAM**.
-  Other ESP32-S3 N16R8 boards with PSRAM may also work, such as an ESP32-S3-WROOM-1 N16R8 module.
+  Other ESP32-S3 N16R8 boards with PSRAM may also work, such as an ESP32-S3-WROOM-1 N16R8 module, XIAO ESP32S3 Sense, other ESP32-S3 development boards exposing sufficient PSRAM.
 
 > [!NOTE]
 > To keep this guide focused and reproducible, all Arduino IDE settings and technical recommendations in this repository are based on the **ESP32-S3 N16R8 configuration**: **16 MB flash** and **8 MB PSRAM**.
