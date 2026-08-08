@@ -362,7 +362,7 @@ These folders are important later in the process.
 
 Connect your ESP32-S3 and check the **Tools** menu in Arduino IDE.
 
-| Arduino IDE menu | Recommended setting | Why it matters |
+| Arduino IDE menu | Recommended setting | Meaning |
 |---|---|---|
 | **Tools > Board** | Select your actual ESP32-S3 board, for example `ESP32S3 Dev Module` or `XIAO ESP32S3 Sense` | The selected board controls available flash, PSRAM, USB, upload, and partition options |
 | **Tools > Port** | Select the serial port assigned to the ESP32-S3 | Required for upload and Serial Monitor output |
@@ -585,33 +585,58 @@ For the reference measurement `M = 536044`:
 | 40 kB | 536044 + 40960 | 577004 bytes |
 | 64 kB | 536044 + 65536 | 601580 bytes |
 
-You can also choose an easy-to-read binary-aligned value above the measured
-requirement.
+You can also choose an easy-to-read binary-aligned value above the measured requirement.
 
 For example:
 ```text
 564 kB = 577536 bytes
 ```
 
-That provides:
+This gives:
 ```text
 577536 - 536044 = 41492 bytes
 ```
-
 of safety margin, which is slightly more than 40 kB.
 
-For the reference model, a readable final configuration could be:
+> [!IMPORTANT]
+> The value to keep for this reference model is:
+> ```text
+> M = 536044 bytes
+> ```
+> Never set the final arena size below `M`. If you do, TensorFlow Lite Micro may fail to allocate tensors and `run_classifier()` can return `-3`.
+> For the reference model, a readable final configuration could be:
+>```cpp
+>#define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 577536
+>const size_t tflite_learn_1072522_47_arena_size = 577536;
+>```
+
+## 💾 Step 9: Save the final tensor arena value in your model header
+
+In Step 5, the arena was temporarily set to `1000000` bytes to ensure that TensorFlow Lite Micro had enough memory to allocate every model tensor.
+
+Now return to the same model header file:
+
+```text
+...\Arduino\libraries\<your-project-name>\src\tflite-model\tflite_learn_XXXXXXX_YY.h
+```
+
+Find the two temporary definitions:
+
+```cpp
+#define EI_CLASSIFIER_TFLITE_LEARN_XXXXXXX_YY_ARENA_SIZE 1000000
+const size_t tflite_learn_XXXXXXX_YY_arena_size = 1000000;
+```
+
+Replace **both values** with your final chosen arena size. In our case, `577536` bytes is a readable choice. It corresponds
+to 564 kB and includes a safety margin of 41492 bytes:
+
 ```cpp
 #define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 577536
 const size_t tflite_learn_1072522_47_arena_size = 577536;
 ```
+Save the header file, then compile and upload the Arduino sketch again.
 
-Replace the temporary `1000000` values in the same
-`tflite_learn_1072522_47.h` file.
-
-Then compile and upload the sketch again.
-
-A successful final test should still display:
+The final test should still display:
 ```text
 run_classifier() return code  : 0 (OK)
 ```
@@ -621,10 +646,8 @@ and:
 DEBUG: Tflite arena used bytes: 536044
 ```
 
-> [!WARNING]
-> Never set the final arena size below `M`. If you do, TensorFlow Lite Micro may fail to allocate tensors and `run_classifier()` can return `-3`.
-
----
+The DEBUG value remains `536044` because it is the actual memory used by the model. The configured arena is now `577536` bytes, which provides `41492` bytes of safety margin.: Tflite arena used bytes: 536044
+```
 
 ## 🖥️ Example serial output
 
