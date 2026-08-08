@@ -655,7 +655,7 @@ The DEBUG value remains `536044` because it is the actual memory used by the mod
 A successful measurement run for the reference model looks like this:
 
 ```text
-HELLO FROM SETUP
+SETUP STARTING
 
 Arduino ESP32-S3 + Edge Impulse - Tensor Arena Size Finder
 ------------------------------------------------------------
