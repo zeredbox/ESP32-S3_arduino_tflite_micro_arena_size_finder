@@ -3,7 +3,7 @@
  * SKETCH TITLE : ESP32-S3 + Edge Impulse Tensor Arena Size Finder
  * FILE NAME    : ESP32-S3_arduino_tflite_micro_arena_size_finder.ino
  * HARDWARE     : Goouuu ESP32-S3 N16R8 (16MB Flash / 8MB OPI PSRAM) + OV2640
- * DATE         : July 2026
+ * DATE         : August 2026
  * AUTHOR       : Zeredbox
  * WEBSITE      : https://github.com/zeredbox/ESP32-S3_arduino_tflite_micro_arena_size_finder
  * LICENSE      : MIT license
