@@ -655,7 +655,7 @@ La valeur DEBUG reste `536044`, car il s’agit de la mémoire réellement utili
 Une exécution de mesure réussie pour le modèle de référence ressemble à ceci :
 
 ```text
-HELLO FROM SETUP
+SETUP STARTING
 
 Arduino ESP32-S3 + Edge Impulse - Tensor Arena Size Finder
 ------------------------------------------------------------
