@@ -508,9 +508,6 @@ or:
 
 Do not increase this value blindly. If the board cannot compile, boot, or allocate the diagnostic Arena, reduce the model's memory requirements or investigate the board's memory configuration.
 
-> [!NOTE]
-> You no longer need to edit `tflite_learn_XXXXXXX_ZZ.h` and temporarily set it to `1000000` before the measurement. The modified `tflite_micro.h` performs that diagnostic override automatically.
-
 ---
 
 ## 🧩 Step 5: Temporarily install the modified `tflite_micro.h`
