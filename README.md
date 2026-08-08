@@ -83,7 +83,7 @@ Both internal SRAM and PSRAM are volatile: their contents are cleared when the b
 
 ---
 
-## 🎯 Why this repository exists
+## 🎯 What is this repository for?
 
 When developing and deploying an on-device AI project on an ESP32-S3, two stages of the process require particularly careful choices:
 
