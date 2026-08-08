@@ -83,7 +83,7 @@ La SRAM interne et la PSRAM sont toutes deux volatiles : leur contenu est effac�
 
 ---
 
-## 🎯 Pourquoi ce dépôt existe
+## 🎯 A quoi sert ce dépôt ?
 
 Lors du développement et du déploiement d’un projet d’IA sur l’appareil sur un ESP32-S3, deux étapes du processus nécessitent une attention particulière :
 
