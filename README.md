@@ -933,4 +933,4 @@ This makes it easier to reproduce results and diagnose changes after a future mo
 
 ## ⚖️ License
 
-Add the license you want to apply to this repository, for example an MIT License.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
