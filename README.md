@@ -1031,7 +1031,7 @@ This makes it easier to reproduce results and diagnose changes after a future mo
 
 ---
 
-## 📚 References & ressources
+## 📚 References
 
 - [Edge Impulse - Transfer learning for images](https://docs.edgeimpulse.com/studio/projects/learning-blocks/blocks/transfer-learning-images)
 - [Edge Impulse - Image classification tutorial](https://docs.edgeimpulse.com/tutorials/end-to-end/image-classification)
@@ -1039,7 +1039,9 @@ This makes it easier to reproduce results and diagnose changes after a future mo
 - [Edge Impulse - Run Arduino library with Arduino IDE 2.x](https://docs.edgeimpulse.com/hardware/deployments/run-arduino-2-0)
 - [Espressif Arduino-ESP32 - Partition tables](https://docs.espressif.com/projects/arduino-esp32/en/latest/tutorials/partition_table.html)
 
-- [Edge Impulse - Forum](https://forum.edgeimpulse.com/)
+## 🌐 Resources
+
+- [Edge Impulse Forum](https://forum.edgeimpulse.com/)
 
 ---
 
