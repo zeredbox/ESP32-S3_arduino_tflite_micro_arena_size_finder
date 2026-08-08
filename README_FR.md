@@ -363,7 +363,7 @@ Ces dossiers seront importants plus loin dans la procédure.
 
 Connectez votre ESP32-S3 et vérifiez le menu **Tools** de l’Arduino IDE.
 
-| Arduino IDE menu | Recommended setting | Meaning |
+| Menu Arduino IDE | Valeurs recommandées | Informations |
 |---|---|---|
 | **Tools > Board** | Sélectionnez votre carte ESP32-S3 réelle, par exemple `ESP32S3 Dev Module` ou `XIAO ESP32S3 Sense` | La carte sélectionnée détermine les options disponibles pour la Flash, la PSRAM, l’USB, le téléversement et les partitions |
 | **Tools > Port** | Sélectionnez le port série attribué à l’ESP32-S3 | Nécessaire pour le téléversement et les messages du Moniteur série |
@@ -521,7 +521,7 @@ ei_printf("DEBUG: Tflite arena used bytes: %d\n",
 
 ---
 
-## ⚡ Étape 6 : compiler, téléverser et lire la valeur clé
+## ⚡ Étape 6 : compiler, téléverser et lire la valeur Tensor arena
 
 1. Ouvrez le sketch `.ino` modifié dans l’Arduino IDE.
 2. Cliquez sur **Upload** pour téléverser le programme sur l’ESP32-S3.
@@ -573,8 +573,8 @@ Une marge de 16 à 64 Ko constitue généralement un bon point de départ pratiq
 
 | Marge | Octets | Cas d’utilisation |
 |---|---:|---|
-| 16 Ko | 16 384 octets | Budget mémoire plus serré après validation |
-| 40 Ko | 40 960 octets | Marge intermédiaire |
+| 16 Ko | 16 384 octets | Peu de marge |
+| 40 Ko | 40 960 octets | Marge moyenne |
 | 64 Ko | 65 536 octets | Marge confortable |
 
 Pour la mesure de référence `M = 536044` :
@@ -714,7 +714,7 @@ La Tensor Arena configurée est temporairement fixée à `1000000` octets pour c
 
 | Output | Meaning |
 |---|---|
-| `PSRAM total : 8388608 bytes` | 8 MiB of PSRAM is available (commonly described as 8 MB) |
+| `PSRAM total : 8388608 bytes` | 8 MB de PSRAM sont disponibles |
 | `Input buffer allocated in PSRAM: 602112 bytes OK` | Le tampon de données d’entrée de 602112 octets a été alloué avec succès dans la PSRAM |
 | `DEBUG: Tflite arena used bytes: 536044` | Il s’agit du besoin mesuré en Tensor Arena `M` pour le modèle de référence |
 | `run_classifier() return code : 0 (OK)` | L’allocation des tenseurs et l’inférence se sont terminées avec succès |
@@ -800,9 +800,7 @@ Example:
 PSRAM totale : 0 octet
 ```
 
-La PSRAM n’est pas détectée ou n’est pas activée.
-
-Vérifiez :
+La PSRAM n’est pas détectée ou n’est pas activée. Vérifiez :
 
 1. Vérifiez que votre carte dispose bien de PSRAM.
 2. Vérifiez que **Tools > PSRAM** est activé.
@@ -821,9 +819,7 @@ Cela signifie généralement que la Tensor Arena est trop petite.
 
 ### ❌ `run_classifier()` renvoie `-3`
 
-Cela est généralement lié à une Tensor Arena insuffisante.
-
-Vérifiez :
+Cela est généralement lié à une Tensor Arena insuffisante. Vérifiez :
 
 - La taille configurée de la Tensor Arena n’est pas inférieure à la valeur mesurée `M`.
 - Both arena definitions use the same value.
@@ -843,13 +839,13 @@ Vérifiez les points suivants :
 
 ### 📁 `YOURMODEL_inferencing.h` introuvable
 
-Replace:
+Remplacez :
 
 ```cpp
 #include <YOURMODEL_inferencing.h>
 ```
 
-with the exact name found in:
+par la valeur exacte trouvée dans :
 
 ```text
 ...\Arduino\libraries\<your-project-name>\src\
