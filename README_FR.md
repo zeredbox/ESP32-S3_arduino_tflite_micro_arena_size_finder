@@ -320,7 +320,7 @@ Sur la page **Déploiement**, configurez l’exportation comme suit :
 
 N’extrayez pas le fichier ZIP téléchargé. Il sera importé directement dans l’Arduino IDE à l’étape suivante.
 
-![Déploiement target](images/Déploiement_target.PNG)
+![La cible de déploiement](images/Deploiement_target.PNG)
 
 > [!IMPORTANT]
 > À partir d’août 2026, sélectionnez **TensorFlow Lite** et **n’utilisez pas** le **compilateur EON** ni sa variante optimisée EON pour ce flux de travail Arduino avec ESP32-S3. Les déploiements EON ont provoqué des problèmes de compatibilité et de gestion mémoire dans des projets ESP32-S3 basés sur Arduino, notamment des résultats d’inférence incorrects, des plantages, des boucles de redémarrage et des erreurs de heap corrompu. **TensorFlow Lite Micro est l’option la plus fiable pour cette procédure.**
