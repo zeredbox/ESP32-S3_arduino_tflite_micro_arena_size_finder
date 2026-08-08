@@ -19,7 +19,7 @@ The example uses a dice-image-classification model, but the same method can be a
 
 ## 👋 Introduction
 
-This repository contains an **Arduino sketch** that measures the **TensorFlow Lite Micro tensor arena** used by an **Edge Impulse model** on an **ESP32-S3** with PSRAM.
+This repository contains an **Arduino diagnostic sketch** and a **temporary modified `tflite_micro.h` file** that together measure the **TensorFlow Lite Micro tensor arena** used by an **Edge Impulse model** on an **ESP32-S3** with PSRAM.
 
 Beyond the usual hobbyist and maker applications, the ESP32-S3 also makes it possible to explore original and engaging on-device AI projects at a modest cost. Its dual-core processor, optional PSRAM, Wi-Fi and Bluetooth connectivity, and support for AI and DSP-oriented instructions provide a practical base for image classification, sound recognition, gesture detection, sensor analysis, and connected edge-AI devices.
 
@@ -47,16 +47,56 @@ Together with **[Edge Impulse](https://edgeimpulse.com/)**, ESP32-S3 provides a 
 
 The Arduino sketch in this repository:
 
-- Prints free internal SRAM heap.
-- Prints the largest available contiguous SRAM heap block.
-- Prints free and total PSRAM.
+- Checks that PSRAM is available.
+- Prints free internal SRAM heap and free/total PSRAM.
+- Uses a temporary **diagnostic Tensor Arena** of `1000000` bytes by default.
 - Allocates the Edge Impulse input feature buffer in PSRAM.
 - Runs `run_classifier()` once with a zero-filled test input.
-- Prints memory usage before and after inference.
-- Prints classification output and timing.
-- Displays the TFLite Micro tensor-arena measurement after a small debug addition inside the Edge Impulse SDK.
+- Reads the Tensor Arena size originally configured by Edge Impulse.
+- Measures the Tensor Arena actually used by TensorFlow Lite Micro after tensor allocation.
+- Warns if the Edge Impulse-generated arena is smaller than the measured usage.
+- Automatically calculates three suggested final arena sizes:
+  - **SMALL = M + 16 KiB**
+  - **MEDIUM = M + 32 KiB** — recommended starting point
+  - **LARGE = M + 64 KiB**
+- Prints the exact two model-header lines that must be updated with the selected value.
 
 The sketch is a diagnostic and sizing tool. It does **not** replace the camera or sensor code in a final project.
+
+## 🔄 Workflow
+
+The complete Tensor Arena sizing workflow is:
+
+1. Create, train, and export your Edge Impulse model as an **Arduino library** using **TensorFlow Lite**.
+2. Install the exported ZIP library in Arduino IDE.
+3. Configure Arduino IDE for your ESP32-S3 board and PSRAM.
+4. In the diagnostic sketch, change only the Edge Impulse inference-header include:
+   ```cpp
+   #include <YOUR_LIBRARY_inferencing.h>  // <-- CHANGE THIS
+   ```
+5. Back up the original Edge Impulse file:
+   ```text
+   src/edge-impulse-sdk/classifier/inferencing_engines/tflite_micro.h
+   ```
+6. Temporarily replace it with the modified file supplied by this repository:
+   ```text
+   edge-impulse-sdk-patch/tflite_micro.h
+   ```
+7. Compile and upload the Tensor Arena Size Finder.
+8. Read the automatically measured value `M` and the generated **SMALL / MEDIUM / LARGE** recommendations in Serial Monitor.
+9. Update **both** Tensor Arena definitions in:
+   ```text
+   src/tflite-model/tflite_learn_XXXXXXX_ZZ.h
+   ```
+10. Restore the **original Edge Impulse `tflite_micro.h`**.
+11. Compile and test your **final application** using the original Edge Impulse SDK file and the new Tensor Arena value.
+
+> [!IMPORTANT]
+> The modified `tflite_micro.h` is only a diagnostic helper. Once the correct Tensor Arena value has been written into your model header, restore the original Edge Impulse file before returning to your final application.
+>
+> If you export a new model or a new Edge Impulse Arduino library, repeat the measurement because the required Tensor Arena size can change.
+
+---
 
 ## 📖 A few technical terms
 
@@ -144,52 +184,65 @@ The real end-to-end rate can be lower because a complete project may also need t
 
 ## 🚧 The tensor arena problem
 
-TensorFlow Lite Micro uses a **tensor arena**: a block of RAM reserved for tensors, intermediate activations, and other model allocations required during inference.
+TensorFlow Lite Micro uses a **tensor arena**: a block of RAM reserved for tensors, intermediate activations, persistent model data, and temporary buffers required during inference.
 
-The arena must be large enough before TensorFlow Lite Micro creates the interpreter.
+The arena must be large enough before TensorFlow Lite Micro can successfully allocate the model tensors.
 
 If it is too small:
 
 - `AllocateTensors()` can fail.
 - `run_classifier()` can return an error such as `-3`.
-- The serial monitor can show messages such as `AllocateTensors() failed`.
-- The device can become unstable if the application is already close to its RAM limits.
+- Inference cannot start correctly.
 
 If it is much larger than necessary:
 
-- Internal SRAM is reserved unnecessarily.
-- Less memory remains for the camera, display, Wi-Fi, application logic, and other buffers.
+- More RAM is reserved than the model actually needs.
+- Less memory remains available for the camera, display, Wi-Fi, application logic, and other buffers.
 
-The correct approach is:
+This repository avoids the old trial-and-error workflow of manually changing the model header to a large temporary value first.
 
-1. Start with a deliberately large tensor arena.
-2. Measure the actual arena use.
-3. Add a safety margin.
-4. Set the final arena size.
-5. Compile and test again.
+Instead, the diagnostic sketch defines:
 
-> [!IMPORTANT]
-> The key line produced by this repository is:
->
-> ```text
-> DEBUG: Tflite arena used bytes: <M>
-> ```
->
-> `<M>` is the measured minimum tensor-arena usage for your model. Never configure the final arena below this value.
-
-For example:
-
-```text
-DEBUG: Tflite arena used bytes: 536044
+```cpp
+#define EI_TFLITE_ARENA_DIAGNOSTIC_SIZE 1000000
 ```
 
-means that TensorFlow Lite Micro actually used:
+before including the Edge Impulse inference header. The modified `tflite_micro.h` supplied with this repository uses that value **temporarily for the diagnostic run**, while still preserving the arena size originally generated by Edge Impulse for comparison.
+
+After TensorFlow Lite Micro successfully allocates its tensors, the modified SDK file captures:
+
+```cpp
+interpreter->arena_used_bytes()
+```
+
+and passes that measured value back to the Arduino sketch.
+
+The sketch then reports:
+
+```text
+Tensor Arena used  : <M> bytes
+```
+
+`M` is the measured Tensor Arena usage for that exact exported model and runtime configuration.
+
+For the reference model used in this repository:
+
+```text
+Tensor Arena used  : 536044 bytes
+```
+
+so:
 
 ```text
 M = 536044 bytes
 ```
 
-for that specific model.
+The sketch then automatically adds safety margins and prints the recommended final values.
+
+> [!IMPORTANT]
+> Never configure the final Tensor Arena below the measured value `M`.
+>
+> The suggested margins are practical starting points, not universal guarantees. Re-test the final application after applying the selected value.
 
 ---
 
@@ -205,12 +258,17 @@ You need:
 > [!NOTE]
 > To keep this guide focused and reproducible, all Arduino IDE settings and technical recommendations in this repository are based on the **ESP32-S3 N16R8 configuration**: **16 MB flash** and **8 MB PSRAM**.
 >
-> If you use another ESP32-S3 board or another memory configuration, the sketch may still work, but you must adapt the Arduino IDE settings - especially **Board**, **Flash Size**, **PSRAM mode**, and **Partition Scheme** - to match your hardware.
+> If you use another ESP32-S3 board or another memory configuration, the sketch may still work, but you must adapt the Arduino IDE settings — especially **Board**, **Flash Size**, **PSRAM mode**, and **Partition Scheme** — to match your hardware.
 
 - Arduino IDE 2.x.
 - Espressif's ESP32 board package installed in Arduino IDE.
-- An Edge Impulse project exported as an Arduino library using TensorFlow Lite.
+- An Edge Impulse project exported as an Arduino library using **TensorFlow Lite**.
 - The `ESP32-S3_arduino_tflite_micro_arena_size_finder.ino` sketch from this repository.
+- The modified diagnostic file supplied in:
+  ```text
+  edge-impulse-sdk-patch/tflite_micro.h
+  ```
+- A backup of the original Edge Impulse `tflite_micro.h` before replacing it temporarily.
 
 ---
 
@@ -380,384 +438,409 @@ Connect your ESP32-S3 and check the **Tools** menu in Arduino IDE.
 
 ## 🛠️ Step 4: Adapt the sketch to your Edge Impulse Arduino library
 
-Open the sketch from this repository in the Arduino IDE.
+Open the sketch from this repository in Arduino IDE.
 
-Near the beginning of the sketch, find these two placeholder lines:
+Near the beginning of the sketch, the user-configuration block contains the diagnostic Arena definition followed by the Edge Impulse inference header:
 
 ```cpp
-#include <YOUR_LIBRARY_inferencing.h>                    // <-- CHANGE THIS
-extern const size_t tflite_learn_XXXXXXX_ZZ_arena_size;  // <-- CHANGE THIS
-```
-Both lines must be adapted to the Arduino library exported from **your own Edge Impulse project**.
+#define EI_TFLITE_ARENA_DIAGNOSTIC_SIZE 1000000
 
-### 4.1 🔗 Include your inference header
-
-Replace `YOUR_LIBRARY` with the exact name of the inference header generated by your Edge Impulse project.
-
-For example, if your Edge Impulse Arduino library is named **Dice**, its inference header is:
-```text
-Dice_inferencing.h
-```
-
-Replace:
-```cpp
 #include <YOUR_LIBRARY_inferencing.h>  // <-- CHANGE THIS
 ```
 
-with:
+Only the line marked `CHANGE THIS` normally needs to be adapted.
+
+### 4.1 🔗 Include your inference header
+
+Replace `YOUR_LIBRARY_inferencing.h` with the exact inference-header filename generated by your Edge Impulse project.
+
+For example, if your Edge Impulse Arduino library is named **Dice**, use:
+
 ```cpp
 #include <Dice_inferencing.h>
 ```
 
-To find the exact filename, open this folder on your computer:
+To find the exact filename, open:
+
 ```text
 ...\Arduino\libraries\<your-project-name>\src\
 ```
 
-### 4.2 🏷️ Declare your tensor-arena size symbol
+and look for the file ending in:
 
-Next, replace the placeholder tensor-arena symbol:
-```cpp
-extern const size_t tflite_learn_XXXXXXX_ZZ_arena_size;  // <-- CHANGE THIS
-```
-
-The exact symbol is defined in the model header generated by Edge Impulse. Open:
 ```text
-...\Arduino\libraries\<your-project-name>\src\tflite-model\
-```
-
-Look for a file similar to:
-```text
-tflite_learn_1072522_47.h
-```
-
-Copy the exact symbol name into the Arduino sketch:
-```cpp
-extern const size_t tflite_learn_1072522_47_arena_size;
+_inferencing.h
 ```
 
 > [!IMPORTANT]
-> Do not invent or simplify the generated arena-size symbol. Copy it exactly from your own `tflite_learn_*.h` file, including every number and underscore. Each Edge Impulse export can generate a different symbol name.
+> The diagnostic macro must remain **before** the Edge Impulse inference header:
+>
+> ```cpp
+> #define EI_TFLITE_ARENA_DIAGNOSTIC_SIZE 1000000
+> #include <YOUR_LIBRARY_inferencing.h>
+> ```
+>
+> The modified `tflite_micro.h` reads this macro while the Edge Impulse library is being compiled.
 
-### 4.3 📏 Set a temporary tensor-arena size
+### 4.2 📏 Diagnostic Arena size
 
-Stay in the same folder:
-```text
-...\Arduino\libraries\<your-project-name>\src\tflite-model\
-```
+The default diagnostic size is:
 
-Open the model header file:
-```text
-tflite_learn_XXXXXXX_ZZ.h
-```
-
-In this example, the file is:
-```text
-tflite_learn_1072522_47.h
-```
-
-Search for the two tensor-arena size definitions. Initially, they may look like this:
 ```cpp
-#define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 519232
-const size_t tflite_learn_1072522_47_arena_size = 519232;
+#define EI_TFLITE_ARENA_DIAGNOSTIC_SIZE 1000000
 ```
 
-For the first test, replace **both values** with a deliberately large temporary value:
+This value is temporary. It does **not** replace the final Tensor Arena value in your model header.
+
+For the reference project, `1000000` bytes is large enough to let TensorFlow Lite Micro allocate the model and measure its real usage.
+
+If `run_classifier()` fails with an allocation-related error such as `-3`, and the Tensor Arena usage is not captured, you can try a larger diagnostic value, for example:
+
 ```cpp
-#define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 1000000
-const size_t tflite_learn_1072522_47_arena_size = 1000000;
+#define EI_TFLITE_ARENA_DIAGNOSTIC_SIZE 1500000
 ```
 
-This gives TensorFlow Lite Micro enough memory to allocate the model tensors and report the actual tensor-arena usage. If `1000000` does not compile, or if the ESP32-S3 cannot start because there is not enough available internal SRAM, use the largest value that your board can support. Then investigate other static memory allocations or consider reducing the model’s memory requirements.
+or:
 
-> [!IMPORTANT]
-> This configuration is temporary. Both lines must use **exactly the same value**.
+```cpp
+#define EI_TFLITE_ARENA_DIAGNOSTIC_SIZE 2000000
+```
+
+Do not increase this value blindly. If the board cannot compile, boot, or allocate the diagnostic Arena, reduce the model's memory requirements or investigate the board's memory configuration.
+
+> [!NOTE]
+> You no longer need to edit `tflite_learn_XXXXXXX_ZZ.h` and temporarily set it to `1000000` before the measurement. The modified `tflite_micro.h` performs that diagnostic override automatically.
 
 ---
 
-## 🐞 Step 5: Add a debug line to show actual tensor-arena usage
+## 🧩 Step 5: Temporarily install the modified `tflite_micro.h`
 
-Open this Edge Impulse SDK file:
+The repository supplies a ready-to-use modified Edge Impulse SDK file:
+
+```text
+edge-impulse-sdk-patch/tflite_micro.h
+```
+
+It replaces the old procedure of manually editing several lines inside the Edge Impulse SDK.
+
+### 5.1 💾 Back up the original file
+
+Locate the original file installed with your Edge Impulse Arduino library:
 
 ```text
 ...\Arduino\libraries\<your-project-name>\
 src\edge-impulse-sdk\classifier\inferencing_engines\tflite_micro.h
 ```
 
-Search for:
-```cpp
-TfLiteStatus allocate_status = interpreter->AllocateTensors(true);
-if (allocate_status != kTfLiteOk) {
-    ei_printf("AllocateTensors() failed");
-    return EI_IMPULSE_TFLITE_ERROR;
-}
+Before replacing it, make a backup. For example, copy it somewhere safe or rename a copy to:
+
+```text
+tflite_micro.h.original
 ```
 
-Immediately after that `if` block, add:
-```cpp
-// Debug: real tensor arena usage for this model.
-// Printed after TFLite Micro has allocated the model tensors.
-ei_printf("DEBUG: Tflite arena used bytes: %d\n",
-          (int)interpreter->arena_used_bytes());
+### 5.2 🔄 Replace it temporarily
+
+Copy the repository version:
+
+```text
+edge-impulse-sdk-patch/tflite_micro.h
 ```
 
-The full section should become:
-```cpp
-TfLiteStatus allocate_status = interpreter->AllocateTensors(true);
-if (allocate_status != kTfLiteOk) {
-    ei_printf("AllocateTensors() failed");
-    return EI_IMPULSE_TFLITE_ERROR;
-}
+over the original file in:
 
-// Debug: real tensor arena usage for this model.
-// Printed after TFLite Micro has allocated the model tensors.
-ei_printf("DEBUG: Tflite arena used bytes: %d\n",
-          (int)interpreter->arena_used_bytes());
+```text
+...\Arduino\libraries\<your-project-name>\
+src\edge-impulse-sdk\classifier\inferencing_engines\
 ```
 
-`interpreter` is a `tflite::MicroInterpreter` object. Its `arena_used_bytes()` method reports the tensor-arena use after tensor allocation.
+The filename used by the library must remain:
 
-`ei_printf()` is sent to the Arduino serial output, so the result appears in the Arduino IDE Serial Monitor.
+```text
+tflite_micro.h
+```
+
+The modified file performs three diagnostic tasks:
+
+1. It temporarily uses `EI_TFLITE_ARENA_DIAGNOSTIC_SIZE` instead of the model-header Arena size.
+2. It records the Arena size originally configured by Edge Impulse.
+3. After `AllocateTensors()` succeeds, it records `interpreter->arena_used_bytes()` so the sketch can calculate the recommended final values automatically.
+
+All project-specific modifications inside the supplied file are clearly marked with comments such as:
+
+```cpp
+// ============================================================================
+// MODIFICATION - ESP32-S3 Tensor Arena Size Finder
+// ============================================================================
+
+// modified code
+
+// ============================================================================
+// END MODIFICATION
+// ============================================================================
+```
+
+> [!WARNING]
+> This is a **temporary diagnostic replacement**, not a permanent replacement for the Edge Impulse SDK file.
+>
+> After you have written the selected Tensor Arena value into your model header, restore the original `tflite_micro.h` before compiling your final application.
+>
+> The modified file is based on the Edge Impulse SDK version used for this project. If a future Edge Impulse export contains a substantially different `tflite_micro.h`, compare the versions before replacing it.
 
 ---
 
-## ⚡ Step 6: Compile, upload, and read the key value
+## ⚡ Step 6: Compile, upload, and run the diagnostic
 
-1. Open the modified `.ino` sketch in the Arduino IDE.
-2. Click **Upload** to flash the ESP32-S3.
+1. Open the adapted `.ino` sketch in Arduino IDE.
+2. Confirm that the modified `tflite_micro.h` is installed in the Edge Impulse library.
+3. Click **Upload** to compile and flash the ESP32-S3.
 4. Open **Tools > Serial Monitor** and set the baud rate to **115200**.
-6. If no output appears, press the board's **Reset** button.
+5. If no output appears, press the board's **Reset** button.
 
 > [!NOTE]
-> The first compilation can take more than 10 minutes because the Arduino IDE must compile the Edge Impulse library, TensorFlow Lite Micro, and their dependencies. Later compilations are usually faster.
+> The first compilation can take more than 10 minutes because Arduino IDE must compile the Edge Impulse library, TensorFlow Lite Micro, and their dependencies. Later compilations are usually faster.
 
-Look for this key line:
-```text
-DEBUG: Tflite arena used bytes: <M>
-```
-
-For example, the test model used in this project displayed:
+A successful run is organized into four sections:
 
 ```text
-DEBUG: Tflite arena used bytes: 536044
+[1] MEMORY CHECK
+[2] DIAGNOSTIC CONFIGURATION
+[3] INFERENCE TEST
+[4] ARENA RECOMMENDATION
 ```
 
-That means:
+The most important measurement is:
+
+```text
+Tensor Arena used  : <M> bytes
+```
+
+For the reference model:
+
+```text
+Tensor Arena used  : 536044 bytes
+```
+
+which means:
 
 ```text
 M = 536044 bytes
 ```
 
-This is the measured tensor arena use for that model. Do not assume your own model has the same value.
+The sketch also reports the Arena originally generated by Edge Impulse:
+
+```text
+Edge Impulse arena : 519232 bytes
+Measured usage (M) : 536044 bytes
+```
+
+Because `519232 < 536044`, the sketch prints:
+
+```text
+WARNING: The arena generated by Edge Impulse is smaller
+than the measured arena usage.
+```
+
+This is exactly the type of mismatch the diagnostic is designed to detect.
 
 ---
 
-## 🧮 Step 7: Calculate the final arena size
+## 🧮 Step 7: Read the automatically calculated final Arena sizes
 
-Use this rule:
+The sketch performs the safety-margin calculations automatically.
+
+It uses:
+
 ```text
-final arena size = M + safety margin
+SMALL  = M + 16 KiB
+MEDIUM = M + 32 KiB
+LARGE  = M + 64 KiB
 ```
 
-For the reference test in this repository, the measured value is:
-```text
-DEBUG: Tflite arena used bytes: 536044
-```
+For the reference measurement:
 
-Therefore:
 ```text
 M = 536044 bytes
 ```
 
-A margin of 16 kB to 64 kB is usually a practical starting range:
+the sketch calculates:
 
-| Margin | Bytes | Use case |
-|---|---:|---|
-| 16 kB | 16,384 bytes | Tighter memory budget after validation |
-| 40 kB | 40,960 bytes | Moderate buffer |
-| 64 kB | 65,536 bytes | Comfortable buffer |
-
-For the reference measurement `M = 536044`:
-
-| Safety margin | Calculation | Final arena size |
+| Recommendation | Calculation | Final Arena size |
 |---|---:|---:|
-| 16 kB | 536044 + 16384 | 552428 bytes |
-| 40 kB | 536044 + 40960 | 577004 bytes |
-| 64 kB | 536044 + 65536 | 601580 bytes |
+| **SMALL** | 536044 + 16384 | **552428 bytes** |
+| **MEDIUM** | 536044 + 32768 | **568812 bytes** |
+| **LARGE** | 536044 + 65536 | **601580 bytes** |
 
-You can also choose an easy-to-read binary-aligned value above the measured requirement.
+The Serial Monitor displays:
 
-For example:
 ```text
-564 kB = 577536 bytes
+SMALL  : 552428 bytes  (+16 KiB)
+MEDIUM : 568812 bytes  (+32 KiB)  <-- RECOMMENDED
+LARGE  : 601580 bytes  (+64 KiB)
+
+Recommended value: 568812 bytes
 ```
 
-This gives:
-```text
-577536 - 536044 = 41492 bytes
-```
-of safety margin, which is slightly more than 40 kB.
+For this project, **MEDIUM** is the recommended starting point because it provides a useful safety margin without keeping the full temporary diagnostic Arena.
 
 > [!IMPORTANT]
-> The value to keep for this reference model is:
-> ```text
-> M = 536044 bytes
-> ```
-> Never set the final arena size below `M`. If you do, TensorFlow Lite Micro may fail to allocate tensors and `run_classifier()` can return `-3`.
-> For the reference model, a readable final configuration could be:
->```cpp
->#define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 577536
->const size_t tflite_learn_1072522_47_arena_size = 577536;
->```
+> The measured value `M` is the lower bound observed for this exact model/runtime configuration. Do not set the final Arena below it.
+>
+> SMALL / MEDIUM / LARGE are suggested safety margins. They are not universal guarantees. Always compile and test the final application after applying the selected value.
 
-## 💾 Step 8: Save the final tensor arena value in your model header
+---
 
-In section 4.3, the arena was temporarily set to `1000000` bytes to ensure that TensorFlow Lite Micro had enough memory to allocate every model tensor.
+## 💾 Step 8: Save the final Tensor Arena value and restore the original SDK file
 
-Now return to the same model header file:
+The diagnostic sketch tells you exactly which model-header file to update:
 
 ```text
-...\Arduino\libraries\<your-project-name>\src\tflite-model\tflite_learn_XXXXXXX_YY.h
+src/tflite-model/tflite_learn_XXXXXXX_ZZ.h
 ```
 
-Find the two temporary definitions:
+Open the matching file inside your installed Edge Impulse Arduino library:
+
+```text
+...\Arduino\libraries\<your-project-name>\
+src\tflite-model\tflite_learn_XXXXXXX_ZZ.h
+```
+
+Find the two Tensor Arena definitions.
+
+For the reference model, the original Edge Impulse export contains:
 
 ```cpp
-#define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 1000000
-const size_t tflite_learn_1072522_47_arena_size = 1000000;
+#define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 519232
+const size_t tflite_learn_1072522_47_arena_size = 519232;
 ```
 
-Replace **both values** with your final chosen arena size. In our case, `577536` bytes is a readable choice. It corresponds
-to 564 kB and includes a safety margin of 41492 bytes:
+The diagnostic recommends:
+
+```text
+MEDIUM : 568812 bytes  (+32 KiB)  <-- RECOMMENDED
+```
+
+Update **both** lines to the same selected value:
 
 ```cpp
-#define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 577536
-const size_t tflite_learn_1072522_47_arena_size = 577536;
+#define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 568812
+const size_t tflite_learn_1072522_47_arena_size = 568812;
 ```
-Save the header file, then compile and upload the Arduino sketch again.
 
-The final test should still display:
+Save the model header.
+
+### 8.1 ♻️ Restore the original `tflite_micro.h`
+
+The measurement is now complete.
+
+Remove the diagnostic replacement and restore the original Edge Impulse file that you backed up in Step 5:
+
 ```text
-run_classifier() return code  : 0 (OK)
+src/edge-impulse-sdk/classifier/inferencing_engines/tflite_micro.h
 ```
 
-and:
-```text
-DEBUG: Tflite arena used bytes: 536044
-```
+Your final project should therefore use:
 
-The DEBUG value remains `536044` because it is the actual memory used by the model. The configured arena is now `577536` bytes, which provides `41492` bytes of safety margin.
+- the **updated Tensor Arena value** in `tflite_learn_XXXXXXX_ZZ.h`;
+- the **original Edge Impulse `tflite_micro.h`**.
+
+Then compile and test your **final application** again.
+
+> [!IMPORTANT]
+> The Tensor Arena Size Finder itself depends on the modified diagnostic `tflite_micro.h`. If you want to run the size finder again later, temporarily reinstall the modified file first.
+>
+> If you retrain the model, change the input dimensions, switch model architecture, change quantization, or export a new Edge Impulse library version, measure the Tensor Arena again.
 
 ---
 
 ## 🖥️ Example serial output
 
-A successful measurement run for the reference model looks like this:
+A successful diagnostic run for the reference model looks like this:
 
 ```text
 SETUP STARTING
 
-Arduino ESP32-S3 + Edge Impulse - Tensor Arena Size Finder
-------------------------------------------------------------
-=== ESP32-S3 Memory Test ===
-Heap free (internal SRAM)    : 342912 bytes
-Heap max contiguous block    : 286708 bytes
-PSRAM free                   : 8386076 bytes
-PSRAM total                  : 8388608 bytes
+=== ESP32-S3 + Edge Impulse Tensor Arena Size Finder ===
 
-=== Current Edge Impulse Arena ===
-Arena configured in tflite_learn_xxx.h : 1000000 bytes
-Arena / (heap free + arena)  : 74.5%
-Arena / max contiguous block : 348.8%
+[1] MEMORY CHECK
+Internal heap free : 342904 bytes
+PSRAM free         : 8386076 bytes
+PSRAM total        : 8388608 bytes
+PSRAM              : OK
 
-Note:
-  - The arena is reserved statically in SRAM by the EI SDK.
-  - Our PSRAM measurements only see dynamic allocations, such as
-    the input feature buffer we allocate below.
+[2] DIAGNOSTIC CONFIGURATION
+Diagnostic arena   : 1000000 bytes
 
---- Allocating NN input buffer in PSRAM ---
-Planned input buffer size     : 602112 bytes
-Input buffer allocated in PSRAM: 602112 bytes OK
+The diagnostic arena temporarily overrides the Edge Impulse
+arena size for this test only.
 
---- Running single inference (run_classifier) ---
-DEBUG: Tflite arena used bytes: 536044
+[3] INFERENCE TEST
+Input buffer       : 602112 bytes in PSRAM
+run_classifier()   : OK
+Tensor Arena used  : 536044 bytes
 
-run_classifier() return code  : 0 (OK)
-Heap used during inference    : 432 bytes
-PSRAM used during inference   : 0 bytes
-Heap free after inference     : 342216 bytes
-PSRAM free after inference    : 7783948 bytes
+[4] ARENA RECOMMENDATION
+Edge Impulse arena : 519232 bytes
+Measured usage (M) : 536044 bytes
 
---- Classification result (dummy input) ---
-  0: 0.934
-  1: 0.059
-  2: 0.000
-  3: 0.004
-  4: 0.000
-  5: 0.000
-  6: 0.004
+WARNING: The arena generated by Edge Impulse is smaller
+than the measured arena usage.
 
-DSP time: 71 ms, NN time: 429 ms
+SMALL  : 552428 bytes  (+16 KiB)
+MEDIUM : 568812 bytes  (+32 KiB)  <-- RECOMMENDED
+LARGE  : 601580 bytes  (+64 KiB)
+
+Recommended value: 568812 bytes
+
+Update BOTH of these lines in your Edge Impulse model header file:
+  src/tflite-model/tflite_learn_XXXXXXX_ZZ.h
+
+  #define EI_CLASSIFIER_TFLITE_LEARN_XXXXXXX_ZZ_ARENA_SIZE 568812
+  const size_t tflite_learn_XXXXXXX_ZZ_arena_size = 568812;
+
+TEST COMPLETE
 ```
-
-The important lines are:
-```text
-DEBUG: Tflite arena used bytes: 536044
-run_classifier() return code  : 0 (OK)
-```
-
-The first line provides the real tensor arena requirement for this model. The second line confirms that inference completed successfully.
-
-The configured arena is temporarily set to `1000000` bytes for this measurement run. After measuring the real requirement, it can be reduced to a final value such as `577536` bytes (564 kB), while retaining a safety margin.
 
 ### 📖 How to read this output
 
 | Output | Meaning |
 |---|---|
-| `PSRAM total : 8388608 bytes` | 8 MiB of PSRAM is available (commonly described as 8 MB) |
-| `Input buffer allocated in PSRAM: 602112 bytes OK` | The 602112-byte input feature buffer was successfully allocated in PSRAM |
-| `DEBUG: Tflite arena used bytes: 536044` | This is the measured tensor arena requirement `M` for the reference model |
-| `run_classifier() return code : 0 (OK)` | Tensor allocation and inference completed successfully |
-| `DSP time: 71 ms, NN time: 429 ms` | DSP preprocessing took 71 ms; neural-network classification took 429 ms |
-| `Arena configured in tflite_learn_xxx.h : 1000000 bytes` | The arena is temporarily oversized for the measurement run and can now be reduced after adding a safety margin |
-| `Heap free after inference : 342216 bytes` | Internal SRAM heap remains available for dynamic allocations after inference |
-| `PSRAM free after inference : 7783948 bytes` | PSRAM remains available after allocating the input feature buffer and running inference |
+| `PSRAM : OK` | PSRAM was detected and is available for the diagnostic sketch |
+| `Diagnostic arena : 1000000 bytes` | Temporary Arena used only for the measurement run |
+| `Input buffer : 602112 bytes in PSRAM` | The Edge Impulse input feature buffer was successfully allocated in PSRAM |
+| `run_classifier() : OK` | Tensor allocation and the test inference completed successfully |
+| `Tensor Arena used : 536044 bytes` | Measured Tensor Arena usage `M` for the reference model |
+| `Edge Impulse arena : 519232 bytes` | Arena size originally generated by Edge Impulse |
+| `WARNING: ... smaller than the measured arena usage` | The original `519232`-byte Arena is below the measured `536044`-byte usage |
+| `MEDIUM : 568812 bytes (+32 KiB) <-- RECOMMENDED` | Recommended starting value for this reference model |
+| `TEST COMPLETE` | The diagnostic completed and the model-header values can now be updated |
 
-The input buffer was allocated in PSRAM. Therefore, its `602112`-byte allocation
-does not consume the internal SRAM heap reported by:
-```cpp
-ESP.getFreeHeap()
-```
+The important distinction is:
 
-The tensor arena is normally reserved statically in internal SRAM by the Edge Impulse / TensorFlow Lite Micro code. This is why the configured arena size does not appear as a dynamic PSRAM allocation in this test.
-
-For this measurement run, the arena was intentionally configured at:
 ```text
-1000000 bytes
+Edge Impulse arena : 519232 bytes
+Diagnostic arena   : 1000000 bytes
+Measured usage (M) : 536044 bytes
+Recommended value  : 568812 bytes
 ```
 
-The actual measured requirement was:
-```text
-536044 bytes
-```
+These values have different roles:
 
-The final arena can therefore be reduced to a value above `536044` bytes, with a safety margin. For example, `577536` bytes (564 kB) leaves a margin of
-`41492` bytes.
+- **519232 bytes** is the value originally generated in the model header.
+- **1000000 bytes** is the temporary diagnostic Arena used only by the size finder.
+- **536044 bytes** is the measured Tensor Arena usage.
+- **568812 bytes** is the recommended MEDIUM value for the final model header.
 
 > [!IMPORTANT]
-> ## 🎯 The value to keep
+> ## 🎯 The values to keep
 >
-> For this reference model, the most important line in the Serial Monitor is:
-> ```text
-> DEBUG: Tflite arena used bytes: 536044
-> ```
->
-> This means that the real minimum TensorFlow Lite Micro tensor arena requirement is:
+> For this exact reference model:
 >
 > ```text
-> M = 536044 bytes
+> Measured usage (M) : 536044 bytes
+> Recommended value  : 568812 bytes
 > ```
-> Do **not** configure the final arena below `536044` bytes for this exact model. A practical final value for this test is `577536` bytes (564 kB), which keeps a safety margin of `41492` bytes.
+>
+> Do not configure the final Arena below `536044` bytes. The recommended starting value produced by the current sketch is `568812` bytes, which adds a `32 KiB` safety margin.
 
 ---
 
@@ -765,9 +848,9 @@ The final arena can therefore be reduced to a value above `536044` bytes, with a
 
 ### ⚠️ Camera compatibility and troubleshooting
 
-This repository focuses on TensorFlow Lite Micro tensor-arena sizing. It assumes that the camera can already capture frames reliably before any machine-learning processing is added.
+This repository focuses on TensorFlow Lite Micro Tensor Arena sizing. It assumes that the camera can already capture frames reliably before any machine-learning processing is added.
 
-Before calling `run_classifier()`, validate the camera separately with a minimal sketch:
+Before calling `run_classifier()` in a final camera application, validate the camera separately with a minimal sketch:
 
 1. Initialize the OV2640 camera with the exact GPIO pin mapping for your board.
 2. Capture and return camera frames repeatedly.
@@ -779,83 +862,110 @@ Before calling `run_classifier()`, validate the camera separately with a minimal
 >
 > Do not assume that an OV2640 board supports every resolution or raw pixel format reliably. Verify JPEG, RGB565, and the selected frame size with the exact board, camera driver, Arduino-ESP32 core version, and pin configuration before integrating Edge Impulse.
 
-### 🔇 No Serial output / Board seems frozen
+### 🔇 No Serial output / board seems frozen
 
-If your ESP32-S3 seems to freeze at startup and nothing appears in the Serial Monitor:
+If your ESP32-S3 seems to freeze at startup and nothing appears in Serial Monitor:
 
-1. **Check USB CDC On Boot:** In the Arduino IDE, make sure `Tools > USB CDC On Boot` is set to **Enabled** if your board is connected via its native USB port.
-2. **Infinite While Loop:** Ensure your `.ino` sketch does not use a blocking `while(!Serial);` without a timeout. On some ESP32-S3 boards, this will wait infinitely for a DTR signal from the monitor. Use a non-blocking timeout instead:
-   ```cpp
-   unsigned long start = millis();
-   while (!Serial && (millis() - start < 2000)) {
-       delay(10);
-   }
-   ```
+1. Check **Tools > USB CDC On Boot** and set it to **Enabled** when using the board's native USB port.
+2. Confirm that Serial Monitor is set to **115200 baud**.
+3. Press the board's **Reset** button after opening Serial Monitor.
+4. Avoid a blocking `while (!Serial);` without a timeout.
 
-### ⚡ PSRAM total is zero
+The project sketch already uses a timeout:
 
-Example:
-
-```text
-PSRAM total : 0 bytes
+```cpp
+unsigned long start = millis();
+while (!Serial && (millis() - start < 2000)) {
+    delay(10);
+}
 ```
 
-PSRAM is not detected or is not enabled.
+### ⚡ `PSRAM : NOT DETECTED`
 
-Check:
+If the output shows:
+
+```text
+PSRAM              : NOT DETECTED
+```
+
+check:
 
 1. Your board actually includes PSRAM.
 2. **Tools > PSRAM** is enabled.
-3. The selected PSRAM mode matches the board, often `OPI PSRAM` for ESP32-S3 boards.
+3. The selected PSRAM mode matches the board, often `OPI PSRAM` for ESP32-S3 N16R8 boards.
 4. The selected board definition is correct.
 
-### ❌ `AllocateTensors() failed`
+The diagnostic stops if PSRAM is not detected because the large input feature buffer is intentionally allocated there.
 
-This usually means the tensor arena is too small.
+### ❌ `AllocateTensors() failed` or `run_classifier()` returns `-3`
 
-1. Return to `tflite_learn_XXXXXXX_ZZ.h`.
-2. Set both arena values back to a large temporary number, such as `1000000`.
-3. Confirm that the macro and `const size_t` use the same number.
-4. Compile and upload again.
-5. Check for the `DEBUG: Tflite arena used bytes: ...` line.
+An allocation-related `-3` can mean that the diagnostic Tensor Arena is still too small.
 
-### ❌ `run_classifier()` returns `-3`
+The default is:
 
-This is commonly related to an insufficient tensor arena.
+```cpp
+#define EI_TFLITE_ARENA_DIAGNOSTIC_SIZE 1000000
+```
+
+You can try a larger diagnostic value, for example:
+
+```cpp
+#define EI_TFLITE_ARENA_DIAGNOSTIC_SIZE 1500000
+```
+
+or:
+
+```cpp
+#define EI_TFLITE_ARENA_DIAGNOSTIC_SIZE 2000000
+```
+
+Then compile and run the diagnostic again.
+
+Also check:
+
+- The modified repository version of `tflite_micro.h` is installed in the Edge Impulse library.
+- `EI_TFLITE_ARENA_DIAGNOSTIC_SIZE` is defined **before** the Edge Impulse inference header.
+- You selected **TensorFlow Lite**, not EON, during Edge Impulse deployment.
+- The Edge Impulse library being compiled is the same library you modified.
+- PSRAM is enabled and detected.
+
+> [!WARNING]
+> Do not keep increasing the diagnostic Arena indefinitely. If a larger value prevents compilation, boot, or allocation, investigate the model size and the board's memory usage instead.
+
+### ❌ `Tensor Arena usage was not captured`
+
+If the sketch reaches the recommendation stage but reports that the Tensor Arena usage was not captured, the modified SDK file is probably missing, outdated, or not the copy being compiled.
 
 Check:
 
-- The configured arena size is not below the measured value `M`.
-- Both arena definitions use the same value.
-- You selected TensorFlow Lite during Edge Impulse deployment.
-- The `tflite_learn_*.h` file being edited belongs to the same library installed and compiled by Arduino IDE.
+1. The file installed at:
+   ```text
+   src/edge-impulse-sdk/classifier/inferencing_engines/tflite_micro.h
+   ```
+   is the modified file supplied by this repository.
+2. You saved the file before recompiling.
+3. Arduino IDE is compiling the expected Edge Impulse library.
+4. The modified file contains the project blocks marked:
+   ```cpp
+   // MODIFICATION - ESP32-S3 Tensor Arena Size Finder
+   ```
+5. Recompile and upload the sketch after replacing the SDK file.
 
-### 🔇 No `DEBUG: Tflite arena used bytes` line
-
-Check the following:
-
-1. You added the `ei_printf(...)` line to `tflite_micro.h`.
-2. The new line is after the successful `AllocateTensors()` check.
-3. You saved `tflite_micro.h`.
-4. You edited the library copy used by Arduino IDE.
-5. Serial Monitor is open at `115200` baud.
-6. You recompiled and uploaded after changing the library file.
-
-### 📁 `YOURMODEL_inferencing.h` not found
+### 📁 `YOUR_LIBRARY_inferencing.h` not found
 
 Replace:
 
 ```cpp
-#include <YOURMODEL_inferencing.h>
+#include <YOUR_LIBRARY_inferencing.h>
 ```
 
-with the exact name found in:
+with the exact filename found in:
 
 ```text
 ...\Arduino\libraries\<your-project-name>\src\
 ```
 
-The filename must end in:
+The filename must normally end in:
 
 ```text
 _inferencing.h
@@ -864,58 +974,61 @@ _inferencing.h
 Example:
 
 ```cpp
-#include <Dice_v4_inferencing.h>
+#include <Dice_inferencing.h>
 ```
 
 Case matters on some operating systems.
 
-### 🔗 Undefined arena symbol
+### 🔗 Errors involving `ei_tflite_arena_used_bytes` or `ei_tflite_model_arena_configured_bytes`
 
-Make sure this line:
+These variables are part of the diagnostic connection between the sketch and the modified `tflite_micro.h`.
 
-```cpp
-extern const size_t tflite_learn_XXXXXXX_ZZ_arena_size;
-```
+If compilation or linking reports one of these names:
 
-matches the exact symbol inside `tflite_learn_*.h`. Copy it character for character.
-
-Example:
-
-```cpp
-extern const size_t tflite_learn_1072522_47_arena_size;
-```
+- Confirm that you are using the current sketch and the current modified `tflite_micro.h` from the same repository version.
+- Do not mix an older intermediate patch with the current sketch.
+- Replace the SDK file again with:
+  ```text
+  edge-impulse-sdk-patch/tflite_micro.h
+  ```
+- Recompile the sketch.
 
 ### 💽 Sketch is too large for the partition
 
-This is a flash-partition problem, not a tensor-arena problem.
+This is a flash-partition problem, not a Tensor Arena problem.
 
 Choose a partition scheme with a larger APP partition, or create a custom `partitions.csv` file.
 
 Remember:
 
 - The **APP partition** stores the compiled program.
-- The **tensor arena** uses RAM at runtime.
+- The **Tensor Arena** uses RAM at runtime.
 - Increasing the APP partition does not increase internal SRAM or PSRAM.
 
 ---
 
 ## 📝 Keep notes when you update the model
 
-The changes in this guide are made inside the exported Edge Impulse Arduino library. If you export a new version of the Edge Impulse library, your modifications can be overwritten.
+The final Tensor Arena value is stored inside the exported Edge Impulse Arduino library. If you export and install a new version of the model library, that model header can be replaced and must be measured again.
 
 For each model version, keep a note of:
 
 - Edge Impulse project and export date.
 - Model architecture and input size.
+- Quantization / deployment settings.
+- Arena value originally generated by Edge Impulse.
+- Diagnostic Arena size used by the size finder.
 - Measured value `M`.
-- Final tensor-arena value.
+- Final selected Tensor Arena value.
 - Safety margin used.
 - ESP32-S3 board name.
 - Flash size.
 - PSRAM mode.
 - Arduino ESP32 core version.
 - Partition scheme.
-- Measured DSP and classification timing.
+- Edge Impulse SDK/library version used for the diagnostic.
+
+After the measurement, remember to restore the original Edge Impulse `tflite_micro.h` for the final application.
 
 This makes it easier to reproduce results and diagnose changes after a future model export.
 
