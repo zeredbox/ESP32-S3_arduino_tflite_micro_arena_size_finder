@@ -748,7 +748,7 @@ The final arena can therefore be reduced to a value above `536044` bytes, with a
 > ## 🎯 The value to keep
 >
 > For this reference model, the most important line in the Serial Monitor is:
->> ```text
+> ```text
 > DEBUG: Tflite arena used bytes: 536044
 > ```
 >
