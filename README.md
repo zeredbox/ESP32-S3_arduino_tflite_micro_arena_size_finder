@@ -701,14 +701,18 @@ Open the matching file inside your installed Edge Impulse Arduino library:
 src\tflite-model\tflite_learn_XXXXXXX_ZZ.h
 ```
 
-Find the two Tensor Arena definitions.
-
-For the reference model, the original Edge Impulse export contains:
+Find the two Tensor Arena definitions. For the reference model used in this repository, the original Edge Impulse export contains:
 
 ```cpp
 #define EI_CLASSIFIER_TFLITE_LEARN_1072522_47_ARENA_SIZE 519232
 const size_t tflite_learn_1072522_47_arena_size = 519232;
 ```
+
+> [!NOTE]
+> These names are only examples from the reference model used in this repository.
+> Your own Edge Impulse export will normally contain a different generated model identifier, so the filename, macro name, and variable name may be different.
+>
+> Do not copy the `1072522_47` identifier from this example. Always modify the two Tensor Arena definitions that already exist in the `tflite_learn_*.h` file generated for your own Edge Impulse model.
 
 The diagnostic recommends:
 
