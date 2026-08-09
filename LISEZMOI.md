@@ -1,7 +1,7 @@
 # Arduino ESP32-S3 + Edge Impulse : trouver la bonne taille de Tensor Arena
 
 # 🚀 Un point de départ pour l’IA embarquée sur ESP32-S3
-**Un guide accessible aux débutants pour la classification d’images avec Edge Impulse et TensorFlow Lite Micro**
+**Un guide pas à pas pour la classification d’images avec Edge Impulse et TensorFlow Lite Micro**
 
 Ce guide constitue un point de départ pratique pour toute personne souhaitant commencer à développer des applications d’IA embarquée sur un ESP32-S3, y compris les débutants complets.
 
