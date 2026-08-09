@@ -1060,7 +1060,7 @@ Before calling `run_classifier()` with real camera data in your final applicatio
 >
 > Do not assume that an OV2640 board supports every resolution or raw pixel format reliably. Verify JPEG, RGB565, and the selected frame size with the exact board, camera driver, Arduino-ESP32 core version, and pin configuration before integrating Edge Impulse.
 
---
+---
 
 ## 📚 References
 
@@ -1074,7 +1074,7 @@ Before calling `run_classifier()` with real camera data in your final applicatio
 
 - [Edge Impulse Forum](https://forum.edgeimpulse.com/)
 
---
+---
 
 ## ⚖️ License
 
