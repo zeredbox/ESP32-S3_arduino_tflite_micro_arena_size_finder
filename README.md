@@ -744,16 +744,47 @@ Your final project should therefore use:
 - the **updated Tensor Arena value** in `tflite_learn_XXXXXXX_ZZ.h`;
 - the **original Edge Impulse `tflite_micro.h`**.
 
-Then compile and test your **final application** again.
+---
+
+## 🚀 Step 9: Return to your original project
+
+**The Tensor Arena sizing process is now complete !**
+
+You now have a measured and properly sized Tensor Arena for your Edge Impulse model.
+
+At this stage:
+
+1. Keep the new Tensor Arena value in your model header:
+   ```text
+   ...\src\tflite-model\tflite_learn_XXXXXXX_ZZ.h
+   ```
+
+2. Make sure the **original Edge Impulse `tflite_micro.h`** has been restored:
+   ```text
+   ...\src\edge-impulse-sdk\classifier\inferencing_engines\tflite_micro.h
+   ```
+
+3. Return to your original Arduino project.
+
+4. Compile and test your **final application** again.
 
 > [!IMPORTANT]
-> The Tensor Arena Size Finder itself depends on the modified diagnostic `tflite_micro.h`. If you want to run the size finder again later, temporarily reinstall the modified file first.
+> The Tensor Arena diagnostic is now finished.
+> You can continue developing your original project — camera capture, image processing, display, Wi-Fi, sensors, application logic, or any other features — using a Tensor Arena size that has been measured on the ESP32-S3 instead of estimated.
 >
-> If you retrain the model, change the input dimensions, switch model architecture, change quantization, or export a new Edge Impulse library version, measure the Tensor Arena again.
+> If you later retrain the model, change its input dimensions, architecture, quantization, or export a new Edge Impulse library, run the Tensor Arena Size Finder again because the required Arena size may change.
 
 ---
 
-## 🖥️ Example serial output
+# 📎 Appendices
+
+The main Tensor Arena sizing procedure is now complete.
+
+The following sections provide additional reference information, example output, and troubleshooting guidance.
+
+---
+
+## 🖥️ Appendix A: Example serial output
 
 A successful diagnostic run for the reference model looks like this:
 
@@ -832,6 +863,7 @@ These values have different roles:
 - **568812 bytes** is the recommended MEDIUM value for the final model header.
 
 > [!IMPORTANT]
+>
 > ## 🎯 The values to keep
 >
 > For this exact reference model:
@@ -845,27 +877,77 @@ These values have different roles:
 
 ---
 
-## 🩺 Troubleshooting
+## 🩺 Appendix B: Troubleshooting
 
-### ⚠️ Camera compatibility and troubleshooting
+The items below are ordered roughly by when they are most likely to appear during the workflow: **compilation first, then startup and memory detection, then inference and measurement, and finally camera integration in the original project.**
 
-This repository focuses on TensorFlow Lite Micro Tensor Arena sizing. It assumes that the camera can already capture frames reliably before any machine-learning processing is added.
+### 📁 1. `YOUR_LIBRARY_inferencing.h` not found
 
-Before calling `run_classifier()` in a final camera application, validate the camera separately with a minimal sketch:
+This error normally appears during compilation if the placeholder inference header has not been replaced.
 
-1. Initialize the OV2640 camera with the exact GPIO pin mapping for your board.
-2. Capture and return camera frames repeatedly.
-3. Confirm that the chosen frame size and pixel format work reliably.
-4. Only then add image conversion, resizing, and TensorFlow Lite Micro inference.
+Replace:
 
-> [!WARNING]
-> A model input size such as 96×96 or 224×224 is not necessarily a camera capture mode. The camera may capture a supported source frame size, then the application converts and resizes that frame into the model input buffer.
->
-> Do not assume that an OV2640 board supports every resolution or raw pixel format reliably. Verify JPEG, RGB565, and the selected frame size with the exact board, camera driver, Arduino-ESP32 core version, and pin configuration before integrating Edge Impulse.
+```cpp
+#include <YOUR_LIBRARY_inferencing.h>
+```
 
-### 🔇 No Serial output / board seems frozen
+with the exact filename found in:
 
-If your ESP32-S3 seems to freeze at startup and nothing appears in Serial Monitor:
+```text
+...\Arduino\libraries\<your-project-name>\src\
+```
+
+The filename must normally end in:
+
+```text
+_inferencing.h
+```
+
+Example:
+
+```cpp
+#include <Dice_inferencing.h>
+```
+
+Case matters on some operating systems.
+
+---
+
+### 🔗 2. Errors involving `ei_tflite_arena_used_bytes` or `ei_tflite_model_arena_configured_bytes`
+
+These variables are part of the diagnostic connection between the sketch and the modified `tflite_micro.h`.
+
+If compilation or linking reports one of these names:
+
+- Confirm that you are using the current sketch and the current modified `tflite_micro.h` from the same repository version.
+- Do not mix an older intermediate patch with the current sketch.
+- Replace the SDK file again with:
+  ```text
+  edge-impulse-sdk-patch/tflite_micro.h
+  ```
+- Recompile the sketch.
+
+---
+
+### 💽 3. Sketch is too large for the partition
+
+This error appears during compilation or upload when the selected APP partition is too small for the compiled program.
+
+This is a flash-partition problem, not a Tensor Arena problem.
+
+Choose a partition scheme with a larger APP partition, or create a custom `partitions.csv` file.
+
+Remember:
+
+- The **APP partition** stores the compiled program.
+- The **Tensor Arena** uses RAM at runtime.
+- Increasing the APP partition does not increase internal SRAM or PSRAM.
+
+---
+
+### 🔇 4. No Serial output / board seems frozen
+
+If the sketch uploads successfully but nothing appears in Serial Monitor:
 
 1. Check **Tools > USB CDC On Boot** and set it to **Enabled** when using the board's native USB port.
 2. Confirm that Serial Monitor is set to **115200 baud**.
@@ -881,9 +963,11 @@ while (!Serial && (millis() - start < 2000)) {
 }
 ```
 
-### ⚡ `PSRAM : NOT DETECTED`
+---
 
-If the output shows:
+### ⚡ 5. `PSRAM : NOT DETECTED`
+
+If the sketch starts but the memory check shows:
 
 ```text
 PSRAM              : NOT DETECTED
@@ -898,7 +982,9 @@ check:
 
 The diagnostic stops if PSRAM is not detected because the large input feature buffer is intentionally allocated there.
 
-### ❌ `AllocateTensors() failed` or `run_classifier()` returns `-3`
+---
+
+### ❌ 6. `AllocateTensors() failed` or `run_classifier()` returns `-3`
 
 An allocation-related `-3` can mean that the diagnostic Tensor Arena is still too small.
 
@@ -933,9 +1019,11 @@ Also check:
 > [!WARNING]
 > Do not keep increasing the diagnostic Arena indefinitely. If a larger value prevents compilation, boot, or allocation, investigate the model size and the board's memory usage instead.
 
-### ❌ `Tensor Arena usage was not captured`
+---
 
-If the sketch reaches the recommendation stage but reports that the Tensor Arena usage was not captured, the modified SDK file is probably missing, outdated, or not the copy being compiled.
+### ❌ 7. `Tensor Arena usage was not captured`
+
+If `run_classifier()` completes but the sketch reaches the recommendation stage without a measured Tensor Arena value, the modified SDK file is probably missing, outdated, or not the copy being compiled.
 
 Check:
 
@@ -952,61 +1040,27 @@ Check:
    ```
 5. Recompile and upload the sketch after replacing the SDK file.
 
-### 📁 `YOUR_LIBRARY_inferencing.h` not found
-
-Replace:
-
-```cpp
-#include <YOUR_LIBRARY_inferencing.h>
-```
-
-with the exact filename found in:
-
-```text
-...\Arduino\libraries\<your-project-name>\src\
-```
-
-The filename must normally end in:
-
-```text
-_inferencing.h
-```
-
-Example:
-
-```cpp
-#include <Dice_inferencing.h>
-```
-
-Case matters on some operating systems.
-
-### 🔗 Errors involving `ei_tflite_arena_used_bytes` or `ei_tflite_model_arena_configured_bytes`
-
-These variables are part of the diagnostic connection between the sketch and the modified `tflite_micro.h`.
-
-If compilation or linking reports one of these names:
-
-- Confirm that you are using the current sketch and the current modified `tflite_micro.h` from the same repository version.
-- Do not mix an older intermediate patch with the current sketch.
-- Replace the SDK file again with:
-  ```text
-  edge-impulse-sdk-patch/tflite_micro.h
-  ```
-- Recompile the sketch.
-
-### 💽 Sketch is too large for the partition
-
-This is a flash-partition problem, not a Tensor Arena problem.
-
-Choose a partition scheme with a larger APP partition, or create a custom `partitions.csv` file.
-
-Remember:
-
-- The **APP partition** stores the compiled program.
-- The **Tensor Arena** uses RAM at runtime.
-- Increasing the APP partition does not increase internal SRAM or PSRAM.
-
 ---
+
+### ⚠️ 8. Camera compatibility and troubleshooting
+
+This issue normally belongs to the **original application**, after the Tensor Arena diagnostic itself has been completed.
+
+This repository focuses on TensorFlow Lite Micro Tensor Arena sizing. The diagnostic sketch does not require live camera input because it runs inference with a zero-filled test buffer.
+
+Before calling `run_classifier()` with real camera data in your final application, validate the camera separately with a minimal sketch:
+
+1. Initialize the OV2640 camera with the exact GPIO pin mapping for your board.
+2. Capture and return camera frames repeatedly.
+3. Confirm that the chosen frame size and pixel format work reliably.
+4. Only then add image conversion, resizing, and TensorFlow Lite Micro inference.
+
+> [!WARNING]
+> A model input size such as 96×96 or 224×224 is not necessarily a camera capture mode. The camera may capture a supported source frame size, then the application converts and resizes that frame into the model input buffer.
+>
+> Do not assume that an OV2640 board supports every resolution or raw pixel format reliably. Verify JPEG, RGB565, and the selected frame size with the exact board, camera driver, Arduino-ESP32 core version, and pin configuration before integrating Edge Impulse.
+
+--
 
 ## 📚 References
 
@@ -1020,7 +1074,7 @@ Remember:
 
 - [Edge Impulse Forum](https://forum.edgeimpulse.com/)
 
----
+--
 
 ## ⚖️ License
 
