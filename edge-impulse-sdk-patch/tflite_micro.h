@@ -74,8 +74,6 @@
 //    by this project. Future Edge Impulse SDK versions may contain changes
 //    that are not compatible with this file.
 //
-// See the project README for the complete procedure.
-//
 // ============================================================================
 // END IMPORTANT NOTICE
 // ============================================================================
